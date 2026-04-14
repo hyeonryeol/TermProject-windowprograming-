@@ -1,0 +1,9 @@
+.vs/
+*.user
+*.suo
+Debug/
+Release/
+x64/
+x86/
+*.obj
+*.pdb
