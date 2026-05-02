@@ -1,12 +1,32 @@
 #include "Intro.h"
-
+#include <string>  
 bool Intro::NextPage() {
     page++;
-    if (page >= 3) return true;  // ← 3장 끝나면 true
+    // ↓ 이 두 줄 추가 (페이지 넘길 때 애니메이션 리셋)
+    charIndex = 0;
+    timer = 0.0f;
+    if (page >= 3) return true;
     return false;
 }
 
 int Intro::GetPage() const { return page; }
+// Draw() 함수 위에 새로 추가
+void Intro::Update(float deltaTime) {
+    const wchar_t* texts[] = {
+        L"당신은 노동복권에 당첨되었습니다.",
+        L"오브리스탄 출입국관리소에서 근무할 기회를 얻게되었습니다.",
+        L"아스토츠카의 영광을 위하여.."
+    };
+    std::wstring fullText = texts[page];
+
+    if (charIndex < (int)fullText.size()) {
+        timer += deltaTime;
+        if (timer >= speed) {
+            charIndex++;
+            timer = 0.0f;
+        }
+    }
+}
 
 void Intro::Draw(HDC hdc, RECT rc) {
     Graphics graphics(hdc);
@@ -24,34 +44,41 @@ void Intro::Draw(HDC hdc, RECT rc) {
     {
     case 0:
     {
-        // 1번째 인트로 그리기
-        Image imageintro1(L"intro\\intro1.png");
-        graphics.DrawImage(&imageintro1, x, y-50, 2*x, 2*y-50);
-        PointF p(1 * x + 110, 3 * y );
-        graphics.DrawString(L"당신은 노동복권에 당첨되었습니다.", -1, &font, p, &brush);
+        Image img(L"intro\\intro1.png");
+        graphics.DrawImage(&img, x, y - 50, 2 * x, 2 * y - 50);
+        PointF p(1 * x + 110, 3 * y);
+        std::wstring fullText = L"당신은 노동복권에 당첨되었습니다.";
+        std::wstring displayText = fullText.substr(0, charIndex);
+        graphics.DrawString(displayText.c_str(), -1, &font, p, &brush);
         break;
     }
     case 1:
     {
-        // 2번째 인트로 그리기
-        Image imageintro2(L"intro\\Obrinspector.png");
-        graphics.DrawImage(&imageintro2, x, y - 50, 2 * x, 2 * y - 50);
-        PointF p(1 * x, 3 * y );
-        graphics.DrawString(L"오브리스탄 출입국관리소에서 근무할 기회를 얻게되었습니다.", -1, &font, p, &brush);
+        Image img(L"intro\\Obrinspector.png");
+        graphics.DrawImage(&img, x, y - 50, 2 * x, 2 * y - 50);
+        PointF p(1 * x, 3 * y);
+        std::wstring fullText = L"오브리스탄 출입국관리소에서 근무할 기회를 얻게되었습니다.";
+        std::wstring displayText = fullText.substr(0, charIndex);
+        graphics.DrawString(displayText.c_str(), -1, &font, p, &brush);
         break;
     }
     case 2:
-        // 3번째 인트로 그리기
-        Image imageintro3(L"intro\\Arstotzka.png");
-        graphics.DrawImage(&imageintro3, x, y - 50, 2 * x, 2 * y - 50);
-        PointF p(1 * x+ 140, 3 * y );
-        graphics.DrawString(L"아스토츠카의 영광을 위하여..", -1, &font, p, &brush);
+    {
+        Image img(L"intro\\Arstotzka.png");
+        graphics.DrawImage(&img, x, y - 50, 2 * x, 2 * y - 50);
+        PointF p(1 * x + 140, 3 * y);
+        std::wstring fullText = L"아스토츠카의 영광을 위하여..";
+        std::wstring displayText = fullText.substr(0, charIndex);
+        graphics.DrawString(displayText.c_str(), -1, &font, p, &brush);
         break;
     }
+    }  // ← switch 닫기
 
     // NEXT 텍스트
-   
-    
-    PointF point(2*x - 50, 3*y + 100);
+    PointF point(2 * x - 50, 3 * y + 100);
     graphics.DrawString(L"NEXT", -1, &font, point, &brush);
-}
+    }
+    // NEXT 텍스트
+
+
+  

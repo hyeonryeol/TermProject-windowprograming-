@@ -52,7 +52,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, PWSTR, int nCmdShow)
     // 3) 창 표시
     ShowWindow(hWnd, nCmdShow);
     UpdateWindow(hWnd);
-
+    SetTimer(hWnd, 1, 16, nullptr);  // ← 추가 (약 60fps)
     // 4) 메시지 루프
     MSG msg = {};
     while (GetMessage(&msg, nullptr, 0, 0))
@@ -69,6 +69,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     switch (msg)
     {
+    case WM_TIMER:
+    {
+        if (currentScene == INTRO)
+        {
+            intro.Update(1.0f / 60.0f);  // ← 고정 deltaTime
+            InvalidateRect(hWnd, nullptr, FALSE);
+        }
+        return 0;
+    }
     case WM_KEYDOWN:
     {
         return 0;
@@ -96,19 +105,32 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         HDC hdc = BeginPaint(hWnd, &ps);
         RECT rc;
         GetClientRect(hWnd, &rc);
-        
+        int width = rc.right - rc.left;
+        int height = rc.bottom - rc.top;
+
+   
+        HDC memDC = CreateCompatibleDC(hdc);
+        HBITMAP memBitmap = CreateCompatibleBitmap(hdc, width, height);
+        HBITMAP oldBitmap = (HBITMAP)SelectObject(memDC, memBitmap);
+        HBRUSH blackBrush = CreateSolidBrush(RGB(0, 0, 0));
+        FillRect(memDC, &rc, blackBrush);
+        DeleteObject(blackBrush);
+
         if (currentScene == INTRO)
-            intro.Draw(hdc, rc);
+            intro.Draw(memDC, rc);
         else if (currentScene == PLAY)
-        {
-            play.Draw(hdc, rc);
-        }
-       
+            play.Draw(memDC, rc);
+
+        BitBlt(hdc, 0, 0, width, height, memDC, 0, 0, SRCCOPY);
+
+   
+        SelectObject(memDC, oldBitmap);
+        DeleteObject(memBitmap);
+        DeleteDC(memDC);
 
         EndPaint(hWnd, &ps);
         return 0;
     }
-
     case WM_DESTROY:
         PostQuitMessage(0);
         return 0;
