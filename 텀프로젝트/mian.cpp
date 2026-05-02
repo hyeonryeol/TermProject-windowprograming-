@@ -1,8 +1,13 @@
 #include <windows.h>
 #include <gdiplus.h>
+#include "Play.h"
+#include "Intro.h"   
+enum Scene { INTRO, PLAY };
+Scene currentScene = INTRO;
 #pragma comment(lib, "gdiplus.lib")
 using namespace Gdiplus;
-
+Intro intro;  // ← 전역으로 선언 (WndProc 위에)
+Play play;
 // 윈도우 프로시저 선언
 LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -25,7 +30,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, PWSTR, int nCmdShow)
     wc.hInstance = hInstance;
     wc.hIcon = LoadIcon(nullptr, IDI_APPLICATION);
     wc.hCursor = LoadCursor(nullptr, IDC_ARROW);
-    wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
+    wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 0);
     wc.lpszClassName = CLASS_NAME;
     wc.hIconSm = LoadIcon(nullptr, IDI_APPLICATION);
 
@@ -37,9 +42,8 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, PWSTR, int nCmdShow)
         CLASS_NAME,
         WINDOW_TITLE,
         WS_OVERLAPPEDWINDOW,
-        0, 0,
-        GetSystemMetrics(SM_CXSCREEN),
-        GetSystemMetrics(SM_CYSCREEN),
+        CW_USEDEFAULT, CW_USEDEFAULT, 1368, 768,
+       
         nullptr, nullptr, hInstance, nullptr
     );
 
@@ -69,7 +73,23 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
     {
         return 0;
     }
-
+    case WM_LBUTTONDOWN:  // ← 마우스 왼쪽 클릭
+    {
+        int x = LOWORD(lParam);  // ← 클릭한 X 좌표
+        int y = HIWORD(lParam);  // ← 클릭한 Y 좌표
+       
+        // 여기에 클릭 처리 코드 작성
+        if (currentScene == INTRO)
+        {
+            if (x >= 634 && x <= 734 && y >= 656 && y <= 716)
+            {
+                bool isEnd = intro.NextPage();
+                if (isEnd) currentScene = PLAY;
+                InvalidateRect(hWnd, nullptr, TRUE);
+            }
+        }
+        return 0;
+    }
     case WM_PAINT:
     {
         PAINTSTRUCT ps;
@@ -77,10 +97,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         RECT rc;
         GetClientRect(hWnd, &rc);
         
-        // TODO: 여기에 그리기 코드 작성
-        Graphics graphics(hdc);
-        Image image(L"papers\\배경.png");
-        graphics.DrawImage(&image, (int)rc.left, (int)rc.top, (int)rc.right, (int)rc.bottom);
+        if (currentScene == INTRO)
+            intro.Draw(hdc, rc);
+        else if (currentScene == PLAY)
+        {
+            play.Draw(hdc, rc);
+        }
+       
 
         EndPaint(hWnd, &ps);
         return 0;
