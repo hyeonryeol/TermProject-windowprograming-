@@ -17,7 +17,7 @@ const wchar_t WINDOW_TITLE[] = L"Win32 Basic Template";
 
 
 // 프로그램 시작점
-int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, PWSTR, int nCmdShow)
+int WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE, _In_ PWSTR pCmdLine, _In_ int nCmdShow)
 {
     GdiplusStartupInput gdiplusStartupInput;
     ULONG_PTR gdiplusToken;
