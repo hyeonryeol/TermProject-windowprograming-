@@ -34,7 +34,7 @@ void Intro::Draw(HDC hdc, RECT rc) {
     int x = rc.right / 4;
     int y = rc.bottom / 4;
     PrivateFontCollection pfc;
-    pfc.AddFontFile(L"fonts\\선전체.TTF");
+    pfc.AddFontFile(L"fonts\\sunjeon.TTF");
     FontFamily fontFamily;
     int found = 0;
     pfc.GetFamilies(1, &fontFamily, &found);
