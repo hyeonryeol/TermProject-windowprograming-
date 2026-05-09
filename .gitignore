@@ -11,3 +11,4 @@ Release/
 *.lib
 __pycache__/
 korean_font.ttf
+*.pyc
