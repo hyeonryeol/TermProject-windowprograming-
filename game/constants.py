@@ -19,11 +19,11 @@ RUINS_DIR  = CRAFTPIX / "2 Objects" / "Ruins"
 ROCKS_DIR  = CRAFTPIX / "2 Objects" / "Rocks"
 
 # ── Colours ──────────────────────────────────────────────
-SKY1   = (42, 33, 22)
-SKY2   = (98, 76, 50)
-GND1   = (62, 50, 32)
-GND2   = (40, 32, 18)
-RAIL_C = (88, 70, 46)
+SKY1   = (8,  12,  28)   # 미래 도시 밤하늘
+SKY2   = (20, 35,  65)
+GND1   = (30, 38,  48)   # 미래 황무지 (콘크리트+먼지)
+GND2   = (18, 24,  32)
+RAIL_C = (55, 75, 100)   # 자기부상 레일 느낌
 WHITE  = (255, 255, 255)
 BLACK  = (0,   0,   0)
 UI_BG  = (16,  12,   8)
@@ -42,36 +42,40 @@ COPPER  = "copper"
 CIRCUIT = "circuit"
 
 RNAMES = {
-    SCRAP: "고철", IRON: "철판", COAL: "석탄",
-    FUEL: "연료",  COPPER: "구리판", CIRCUIT: "회로",
+    SCRAP:   "선체 패널",    # 비행체 갑판 뜯은 것
+    IRON:    "정제 합금",
+    COAL:    "연료 전지",    # 비행체에서 탈취한 연료 전지
+    FUEL:    "플라즈마",     # 가공된 추진 연료
+    COPPER:  "나노칩",
+    CIRCUIT: "양자 코어",
 }
 RCOLORS = {
-    SCRAP:   (155, 135, 100),
-    IRON:    (180, 190, 200),
-    COAL:    ( 50,  50,  60),
-    FUEL:    (220, 162,  42),
-    COPPER:  (210, 140,  58),
-    CIRCUIT: ( 62, 200, 122),
+    SCRAP:   (140, 165, 190),  # 은청색 금속 패널
+    IRON:    (190, 210, 230),  # 크롬 합금
+    COAL:    ( 40, 210, 180),  # 발광하는 연료 전지 (청록)
+    FUEL:    (120,  80, 230),  # 플라즈마 보라
+    COPPER:  (240, 200,  60),  # 금빛 나노칩
+    CIRCUIT: ( 80, 255, 160),  # 양자 코어 형광 녹색
 }
 
 # ── Node types ───────────────────────────────────────────
 NODES = {
     "ruin": {
-        "label": "폐허",
-        "yields": {SCRAP: (4, 10), COAL: (0, 3)},
-        "time": 3.5,
+        "label": "방치된 비행체",       # 파일럿이 자리 비운 사이 약탈
+        "yields": {SCRAP: (5, 12), COAL: (2, 6)},
+        "time": 4.0,
         "sprite_pool": "ruins",
     },
     "rock": {
-        "label": "바위",
-        "yields": {SCRAP: (2, 5)},
-        "time": 2.0,
+        "label": "추락한 드론",
+        "yields": {SCRAP: (2, 6), COPPER: (0, 2)},
+        "time": 2.5,
         "sprite_pool": "rocks",
     },
     "coal_seam": {
-        "label": "석탄층",
-        "yields": {COAL: (6, 14)},
-        "time": 4.0,
+        "label": "비상 연료 저장소",
+        "yields": {COAL: (8, 18)},
+        "time": 4.5,
         "sprite_pool": "rocks",
     },
 }
@@ -85,34 +89,34 @@ M_ASSEMBLER = "assembler"
 
 MDEF = {
     M_FURNACE: {
-        "name": "용광로",     "size": (1, 2),
+        "name": "나노 용융로",   "size": (1, 2),
         "cost": {},
-        "inp":  {SCRAP: 3},  "out": {IRON: 1}, "time": 5.0,
-        "color": (175, 72, 32),
+        "inp":  {SCRAP: 3},     "out": {IRON: 1}, "time": 5.0,
+        "color": (40, 140, 200),   # 산업용 청색
     },
     M_FUEL: {
-        "name": "연료 변환기", "size": (1, 2),
+        "name": "플라즈마 추출기", "size": (1, 2),
         "cost": {IRON: 3},
-        "inp":  {COAL: 2},   "out": {FUEL: 12}, "time": 3.5,
-        "color": (205, 155, 38),
+        "inp":  {COAL: 2},      "out": {FUEL: 12}, "time": 3.5,
+        "color": (100, 50, 200),   # 보라
     },
     M_STORAGE: {
-        "name": "저장고",     "size": (1, 2),
+        "name": "화물 컨테이너", "size": (1, 2),
         "cost": {IRON: 2},
-        "inp":  None,         "out": None,      "time": 0,
-        "color": (72, 92, 112),
+        "inp":  None,            "out": None,      "time": 0,
+        "color": (50, 75, 100),
     },
     M_BELT: {
-        "name": "컨베이어",   "size": (1, 1),
+        "name": "자기 컨베이어", "size": (1, 1),
         "cost": {IRON: 1},
-        "inp":  None,         "out": None,      "time": 0,
-        "color": (95, 95, 72),
+        "inp":  None,            "out": None,      "time": 0,
+        "color": (30, 100, 120),
     },
     M_ASSEMBLER: {
-        "name": "조립기",     "size": (2, 2),
+        "name": "양자 조립기",   "size": (2, 2),
         "cost": {IRON: 10, COPPER: 5},
         "inp":  {IRON: 2, COPPER: 1}, "out": {CIRCUIT: 1}, "time": 7.0,
-        "color": (52, 112, 175),
+        "color": (60, 200, 140),   # 형광 청록
     },
 }
 

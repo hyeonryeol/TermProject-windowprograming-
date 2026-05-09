@@ -21,36 +21,48 @@ class Train:
             FUEL: 0,   COPPER: 0, CIRCUIT: 0,
         }
 
-        # Car order: ["loco", "water", "cargo", "cargo"]
+        # 차량 순서: 뒤→앞 (왼쪽→오른쪽). 기관차가 맨 앞(오른쪽)
         self._build_sprites()
 
     # ── Geometry ───────────────────────────────────────────
     def _build_sprites(self):
-        """Pre-scale and cache sprite rects for each car."""
+        """Pre-scale and cache sprite rects for each car.
+        순서: cargo → cargo → water → loco (왼쪽→오른쪽)
+        기관차(loco)가 가장 오른쪽 = 진행 방향 앞.
+        기관차 스프라이트는 오른쪽을 향하도록 좌우 반전.
+        """
         a = self.assets
         self._cars = []
-        cursor = TRAIN_SCREEN_X   # left edge of current car
+        cursor = TRAIN_SCREEN_X
 
-        for key in ("loco", "water", "cargo", "cargo"):
-            img = a.get(key)
+        # 기관차를 오른쪽 반전
+        loco_raw = a.get("loco")
+        if loco_raw:
+            loco_img = pygame.transform.flip(loco_raw, True, False)
+        else:
+            loco_img = None
+
+        for key, img in [("cargo", a.get("cargo")),
+                         ("cargo", a.get("cargo")),
+                         ("water", a.get("water")),
+                         ("loco",  loco_img)]:
             if img is None:
                 w, h = 120, 80
             else:
                 w, h = img.get_size()
-            # Bottom of car sits on ground
             rect = pygame.Rect(cursor, GROUND_Y - h, w, h)
             self._cars.append((key, img, rect))
-            cursor += w - 2   # slight overlap to look connected
+            cursor += w - 2
 
         self.train_width   = cursor - TRAIN_SCREEN_X
-        self.center_offset = self.train_width // 2   # from world_x to centre
+        self.center_offset = self.train_width // 2
 
     @property
-    def center_world_x(self) -> float:
+    def center_world_x(self):
         return self.world_x + self.center_offset
 
     @property
-    def rear_world_x(self) -> float:
+    def rear_world_x(self):
         return self.world_x + self.train_width
 
     # ── Inventory helpers ──────────────────────────────────
@@ -103,9 +115,9 @@ class Train:
     def _draw_smoke(self, screen: pygame.Surface, camera_x: float) -> None:
         import math, time
         t = time.time()
-        # Smoke from chimney at ~30px from left of loco, near top
-        loco_rect = self._cars[0][2]
-        cx = loco_rect.x + 30
+        # 기관차는 마지막 차량(가장 오른쪽) → 굴뚝은 오른쪽에서 30px 안쪽
+        loco_rect = self._cars[-1][2]
+        cx = loco_rect.right - 30
         cy = loco_rect.y + 8
         for i in range(3):
             phase = t * 1.5 + i * 0.6

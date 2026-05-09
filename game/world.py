@@ -161,7 +161,7 @@ class World:
             )
             pts.append((hx, hy))
         pts += [(SCREEN_W, HORIZON_Y + 40), (SCREEN_W, GROUND_Y), (0, GROUND_Y)]
-        pygame.draw.polygon(screen, (55, 43, 28), pts)
+        pygame.draw.polygon(screen, (20, 30, 55), pts)   # 미래 도시 실루엣
 
         # Second layer (closer, darker)
         offset2 = self.camera_x * 0.32
@@ -173,20 +173,36 @@ class World:
             )
             pts2.append((i, hy))
         pts2 += [(SCREEN_W, HORIZON_Y + 90), (SCREEN_W, GROUND_Y), (0, GROUND_Y)]
-        pygame.draw.polygon(screen, (48, 38, 24), pts2)
+        pygame.draw.polygon(screen, (14, 22, 42), pts2)
+
+        # 배경 도시 불빛 (미래 느낌)
+        self._draw_city_lights(screen, offset)
+
+    def _draw_city_lights(self, screen, offset):
+        """지평선 위 미래 도시 불빛 점들."""
+        import random as _r
+        rng = _r.Random(42)
+        for i in range(60):
+            bx = int((rng.randint(0, 2000) - offset * 0.1) % SCREEN_W)
+            by = HORIZON_Y - rng.randint(5, 80)
+            alpha = rng.randint(80, 200)
+            col = rng.choice([(80,180,255), (255,140,60), (120,255,180), (200,100,255)])
+            s = pygame.Surface((3, 3), pygame.SRCALPHA)
+            s.fill((col[0], col[1], col[2], alpha))
+            screen.blit(s, (bx, by))
 
     def _draw_rail(self, screen: pygame.Surface) -> None:
         ry = RAIL_Y
-        # Rail bed
+        # 자기부상 레일 베드
         pygame.draw.rect(screen, RAIL_C,       (0, ry - 2, SCREEN_W, 16))
-        pygame.draw.rect(screen, (70, 55, 35), (0, ry,     SCREEN_W, 12))
+        pygame.draw.rect(screen, (25, 40, 65), (0, ry,     SCREEN_W, 12))
 
-        # Rail lines
-        pygame.draw.rect(screen, (110, 95, 65), (0, ry,     SCREEN_W, 3))
-        pygame.draw.rect(screen, (110, 95, 65), (0, ry + 8, SCREEN_W, 3))
+        # 레일 라인 (파란 빛 느낌)
+        pygame.draw.rect(screen, ( 80, 140, 220), (0, ry,     SCREEN_W, 3))
+        pygame.draw.rect(screen, ( 80, 140, 220), (0, ry + 8, SCREEN_W, 3))
 
-        # Ties (sleepers) – scroll with world
+        # Ties – scroll with world
         tie_gap = 42
         off = int(self.camera_x) % tie_gap
         for x in range(-off, SCREEN_W, tie_gap):
-            pygame.draw.rect(screen, (60, 48, 30), (x - 2, ry - 5, 10, 22))
+            pygame.draw.rect(screen, (35, 55, 85), (x - 2, ry - 5, 10, 22))
