@@ -9,3 +9,4 @@ Release/
 *.ilk
 *.exp
 *.lib
+__pycache__/
