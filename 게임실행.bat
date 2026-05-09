@@ -1,19 +1,15 @@
 @echo off
 chdir /d "%~dp0"
 
-echo pygame 설치 확인 중...
-python -c "import pygame" 2>nul
+echo Ursina 설치 확인 중...
+python -c "import ursina" 2>nul
 if %errorlevel% neq 0 (
-    echo pygame 없음. pygame-ce 설치 중...
-    pip install pygame-ce -q
-    if %errorlevel% neq 0 (
-        echo pygame-ce 실패. 다른 방법 시도 중...
-        pip install pygame --pre -q
-    )
+    echo Ursina 설치 중...
+    pip install ursina -q
 )
 
 echo.
-echo Iron Crawler 시작!
+echo Iron Crawler 3D 시작!
 python main.py
 if %errorlevel% neq 0 (
     echo.
