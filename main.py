@@ -27,6 +27,19 @@ window.size                = (1280, 720)
 window.fps_counter.enabled = False
 window.exit_button.enabled = False
 
+# ── 한국어 폰트 설정 ──────────────────────────────────────────────────────────
+import os
+_KO_FONTS = [
+    r'C:\Windows\Fonts\malgun.ttf',      # 맑은 고딕 (Windows)
+    r'C:\Windows\Fonts\malgunbd.ttf',
+    r'C:\Windows\Fonts\gulim.ttc',       # 굴림
+    r'C:\Windows\Fonts\batang.ttc',      # 바탕
+]
+for _fp in _KO_FONTS:
+    if os.path.exists(_fp):
+        Text.default_font = _fp
+        break
+
 # ── 3D 게임 상수 ──────────────────────────────────────────────────────────────
 SPD_BASE   = 4.5
 SPD_MAX    = 11.0
