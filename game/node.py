@@ -27,7 +27,7 @@ class ResourceNode:
         self.gather_time = nd["time"]
 
         # Roll yields
-        self.resources: dict[str, int] = {}
+        self.resources = {}
         for res, (lo, hi) in nd["yields"].items():
             amt = random.randint(lo, hi)
             if amt > 0:

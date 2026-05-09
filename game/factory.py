@@ -108,7 +108,7 @@ class FactoryView:
     def __init__(self, train, assets: dict):
         self.train    = train
         self.assets   = assets
-        self.machines: list[Machine] = []
+        self.machines = []
         self.grid     = [[None] * FGRID_W for _ in range(FGRID_H)]
         self.selected = M_FURNACE    # selected machine type from palette
         self.anim_t   = 0.0

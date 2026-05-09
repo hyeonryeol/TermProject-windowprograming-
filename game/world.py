@@ -27,8 +27,8 @@ class World:
         self.assets  = assets
         self.camera_x = 0.0      # world x of screen left edge
 
-        self.nodes:   list[ResourceNode] = []
-        self.workers: list[Worker] = []
+        self.nodes   = []
+        self.workers = []
         self._next_node_x = 700.0   # next node spawn position
 
         # Background helpers

@@ -16,7 +16,7 @@ class Worker:
         self.world_x  = float(start_world_x)
         self.node     = node
         self.state    = self.OUTBOUND
-        self.gathered: dict[str, int] = {}
+        self.gathered = {}
         self.anim_timer = 0.0
         self.gather_timer = 0.0
         node.being_gathered = True
