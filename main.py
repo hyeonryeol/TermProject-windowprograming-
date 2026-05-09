@@ -26,6 +26,7 @@ app = Ursina(title='Iron Crawler - 아이언 크롤러')
 window.size                = (1280, 720)
 window.fps_counter.enabled = False
 window.exit_button.enabled = False
+window.color               = color.rgb(5, 8, 20)   # 밤하늘 배경
 
 # ── 한국어 폰트 설정 ──────────────────────────────────────────────────────────
 # Ursina는 절대경로를 못 읽으므로 로컬에 복사해서 상대경로로 지정
@@ -541,9 +542,8 @@ _pause_lbl = Text(parent=camera.ui, text='일시 정지  [SPACE]',
 # 카메라
 # ═══════════════════════════════════════════════════════════════════════════════
 
-camera.rotation_x = 63
-camera.y          = 20
-camera.z          = -14
+camera.position   = Vec3(0, 22, -16)
+camera.rotation_x = 62
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -574,7 +574,9 @@ def update():
 
     # ── 카메라 팔로우 ────────────────────────────────────────────────────────
     target_x = train.x - 4
-    camera.x += (target_x - camera.x) * min(dt * 4, 1.0)
+    camera.x  += (target_x - camera.x) * min(dt * 4, 1.0)
+    camera.y   = 22
+    camera.z   = -16
 
     # ── 노드 생성 & 업데이트 ─────────────────────────────────────────────────
     _gen_nodes(train.x)
