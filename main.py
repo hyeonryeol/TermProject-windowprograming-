@@ -28,17 +28,22 @@ window.fps_counter.enabled = False
 window.exit_button.enabled = False
 
 # ── 한국어 폰트 설정 ──────────────────────────────────────────────────────────
-import os
-_KO_FONTS = [
-    r'C:\Windows\Fonts\malgun.ttf',      # 맑은 고딕 (Windows)
+# Ursina는 절대경로를 못 읽으므로 로컬에 복사해서 상대경로로 지정
+import os, shutil
+
+_LOCAL_FONT = 'korean_font.ttf'
+_WIN_FONTS  = [
+    r'C:\Windows\Fonts\malgun.ttf',
     r'C:\Windows\Fonts\malgunbd.ttf',
-    r'C:\Windows\Fonts\gulim.ttc',       # 굴림
-    r'C:\Windows\Fonts\batang.ttc',      # 바탕
 ]
-for _fp in _KO_FONTS:
-    if os.path.exists(_fp):
-        Text.default_font = _fp
-        break
+if not os.path.exists(_LOCAL_FONT):
+    for _wf in _WIN_FONTS:
+        if os.path.exists(_wf):
+            shutil.copy(_wf, _LOCAL_FONT)
+            break
+
+if os.path.exists(_LOCAL_FONT):
+    Text.default_font = _LOCAL_FONT
 
 # ── 3D 게임 상수 ──────────────────────────────────────────────────────────────
 SPD_BASE   = 4.5
