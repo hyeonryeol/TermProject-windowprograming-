@@ -25,6 +25,8 @@ app = Ursina(title='Iron Crawler - 아이언 크롤러')
 window.size                = (1280, 720)
 window.fps_counter.enabled = True
 window.exit_button.enabled = False
+# Panda3D 직접 배경색 설정 (window.color / Sky() 대신 확실한 방법)
+base.setBackgroundColor(0.02, 0.03, 0.08, 1)
 
 # ── 한국어 폰트 ───────────────────────────────────────────────────────────────
 _LOCAL_FONT = 'korean_font.ttf'
@@ -61,9 +63,6 @@ class GS:
     m_timers  = {}
 
 gs = GS()
-
-# ── 배경 스카이 ───────────────────────────────────────────────────────────────
-Sky(color=color.rgb(5, 8, 20))
 
 # ── 월드 ─────────────────────────────────────────────────────────────────────
 ground = Entity(
@@ -401,9 +400,9 @@ _pause_lbl = Text(parent=camera.ui, text='일시 정지  [SPACE]',
                   color=color.rgb(195, 145, 52), enabled=False)
 
 # ── 카메라 ────────────────────────────────────────────────────────────────────
-window.color      = color.rgb(5, 8, 20)
-camera.position   = Vec3(0, 22, -16)
-camera.rotation_x = 62
+camera.position   = Vec3(0, 20, 0)
+camera.rotation_x = 85    # 거의 수직 탑다운, 약간의 원근감
+camera.fov        = 90
 
 # ── 메인 업데이트 ─────────────────────────────────────────────────────────────
 def update():
@@ -427,9 +426,8 @@ def update():
         ground.x = train.x
         rail.x   = train.x
 
-        # 카메라 기차 팔로우 (직접 이동)
-        target_cx = train.x - 4
-        camera.x += (target_cx - camera.x) * min(dt * 4, 1.0)
+        # 카메라 기차 팔로우
+        camera.x += (train.x - camera.x) * min(dt * 4, 1.0)
 
         # 기관차 발광 애니메이션
         g = 0.45 + math.sin(time.time() * 3) * 0.08
