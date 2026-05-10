@@ -401,10 +401,8 @@ _pause_lbl = Text(parent=camera.ui, text='일시 정지  [SPACE]',
                   color=color.rgb(195, 145, 52), enabled=False)
 
 # ── 카메라 ────────────────────────────────────────────────────────────────────
-# 피벗 방식: 카메라를 빈 엔티티에 붙이고 피벗만 이동
-cam_pivot = Entity()
-camera.parent     = cam_pivot
-camera.position   = Vec3(-4, 22, -16)
+window.color      = color.rgb(5, 8, 20)
+camera.position   = Vec3(0, 22, -16)
 camera.rotation_x = 62
 
 # ── 메인 업데이트 ─────────────────────────────────────────────────────────────
@@ -429,8 +427,9 @@ def update():
         ground.x = train.x
         rail.x   = train.x
 
-        # 카메라 피벗 팔로우
-        cam_pivot.x += (train.x - cam_pivot.x) * min(dt * 4, 1.0)
+        # 카메라 기차 팔로우 (직접 이동)
+        target_cx = train.x - 4
+        camera.x += (target_cx - camera.x) * min(dt * 4, 1.0)
 
         # 기관차 발광 애니메이션
         g = 0.45 + math.sin(time.time() * 3) * 0.08
