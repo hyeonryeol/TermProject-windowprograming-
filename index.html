@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🦌 방치형 고라니 키우기</title>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#0a1f0a;--panel:rgba(5,20,5,0.93);--border:#2a5a2a;
+  --accent:#5cb85c;--gold:#ffd700;--exp:#64b5f6;--grass:#81c784;
+  --text:#d4edda;--muted:#6a8a6a;
+}
+body{background:var(--bg);color:var(--text);font-family:'Malgun Gothic','Apple SD Gothic Neo',sans-serif;height:100vh;display:flex;flex-direction:column;overflow:hidden;user-select:none;}
+
+/* TOP BAR */
+#topbar{background:var(--panel);border-bottom:2px solid var(--border);padding:7px 14px;display:flex;align-items:center;gap:0;flex-shrink:0;z-index:10;}
+.res{display:flex;align-items:center;gap:7px;padding:3px 16px;border-right:1px solid var(--border);}
+.res:last-of-type{border-right:none;}
+.res-icon{font-size:18px;}
+.res-info{display:flex;flex-direction:column;}
+.res-val{font-size:15px;font-weight:bold;line-height:1.1;}
+.res-rate{font-size:10px;color:var(--muted);}
+.grass-val{color:var(--grass);}
+.exp-val{color:var(--exp);}
+.gold-val{color:var(--gold);}
+#save-btn{margin-left:auto;background:none;border:1px solid var(--border);color:var(--muted);padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px;transition:all .2s;}
+#save-btn:hover{border-color:var(--accent);color:var(--text);}
+
+/* LAYOUT */
+#main{flex:1;display:grid;grid-template-columns:240px 1fr 275px;overflow:hidden;min-height:0;}
+
+/* LEFT */
+#left{background:var(--panel);border-right:2px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
+.tab-bar{display:flex;border-bottom:1px solid var(--border);flex-shrink:0;}
+.tab{flex:1;padding:8px 4px;text-align:center;font-size:12px;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;transition:all .2s;}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+.tab-content{flex:1;overflow-y:auto;padding:12px;display:none;}
+.tab-content.active{display:block;}
+.section-title{font-size:11px;color:var(--accent);font-weight:bold;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;padding-bottom:3px;border-bottom:1px solid rgba(92,184,92,.2);}
+.panel-section{margin-bottom:14px;}
+#deer-portrait{text-align:center;margin-bottom:10px;}
+#deer-emoji-left{font-size:64px;display:block;line-height:1;margin-bottom:5px;filter:drop-shadow(0 4px 8px rgba(0,0,0,.5));}
+#deer-name-left{font-size:14px;font-weight:bold;color:var(--accent);}
+#deer-stage-left{font-size:11px;color:var(--muted);margin-top:2px;}
+.stat-row{display:flex;justify-content:space-between;align-items:center;padding:3px 0;font-size:12px;border-bottom:1px solid rgba(255,255,255,.04);}
+.stat-label{color:var(--muted);}
+.stat-val{font-weight:bold;}
+.achievement{display:flex;align-items:center;gap:8px;padding:6px;border-radius:6px;margin-bottom:6px;font-size:12px;border:1px solid transparent;}
+.achievement.unlocked{background:rgba(255,215,0,.07);border-color:rgba(255,215,0,.22);}
+.achievement.locked{opacity:.28;}
+.ach-icon{font-size:22px;flex-shrink:0;}
+.ach-name{font-weight:bold;color:var(--gold);line-height:1.2;}
+.ach-desc{color:var(--muted);font-size:11px;}
+
+/* SCENE */
+#scene{position:relative;cursor:pointer;overflow:hidden;background:linear-gradient(180deg,#061506 0%,#0d2b0d 45%,#132a0b 100%);}
+#sky{position:absolute;inset:0;height:55%;pointer-events:none;}
+.star{position:absolute;border-radius:50%;background:#fff;animation:twinkle var(--d,3s) ease-in-out infinite var(--dl,0s);}
+@keyframes twinkle{0%,100%{opacity:.8;}50%{opacity:.1;}}
+.bg-tree{position:absolute;bottom:85px;font-size:var(--sz,70px);opacity:.55;animation:sway var(--sw,5s) ease-in-out infinite var(--sd,0s);pointer-events:none;}
+@keyframes sway{0%,100%{transform:rotate(-1.5deg);}50%{transform:rotate(1.5deg) translateX(2px);}}
+#ground{position:absolute;bottom:0;left:0;right:0;height:95px;background:linear-gradient(180deg,#1a4a0a 0%,#0d2a06 100%);border-top:3px solid #2d6a1a;}
+.tuft{position:absolute;bottom:93px;font-size:14px;opacity:.7;animation:tuft-sway 3.5s ease-in-out infinite;}
+@keyframes tuft-sway{0%,100%{transform:rotate(-5deg);}50%{transform:rotate(5deg);}}
+#deer{position:absolute;bottom:90px;left:50%;transform:translateX(-50%);text-align:center;z-index:5;cursor:pointer;transition:filter .2s;}
+#deer:hover{filter:brightness(1.25);}
+#deer-emoji{font-size:90px;display:block;line-height:1;animation:idle 3s ease-in-out infinite;filter:drop-shadow(0 8px 16px rgba(0,0,0,.6));}
+@keyframes idle{0%,100%{transform:translateY(0);}50%{transform:translateY(-7px);}}
+#deer.bounce #deer-emoji{animation:bounce .4s cubic-bezier(.36,.07,.19,.97);}
+@keyframes bounce{0%{transform:scale(1) rotate(0deg);}30%{transform:scale(1.3) rotate(-8deg);}70%{transform:scale(1.1) rotate(8deg);}100%{transform:scale(1) rotate(0deg);}}
+#nametag{background:rgba(0,10,0,.85);border:1px solid var(--accent);border-radius:20px;padding:3px 12px;font-size:12px;white-space:nowrap;margin-top:4px;display:inline-block;}
+#scene-expbar{position:absolute;bottom:205px;left:50%;transform:translateX(-50%);width:180px;z-index:6;text-align:center;}
+#scene-explabel{font-size:11px;color:var(--muted);margin-bottom:2px;}
+.bar-track{height:8px;background:rgba(0,0,0,.5);border-radius:4px;overflow:hidden;border:1px solid rgba(255,255,255,.08);}
+#exp-fill{height:100%;background:linear-gradient(90deg,#1565c0,#64b5f6);border-radius:4px;transition:width .4s ease;width:0%;}
+.particle{position:absolute;pointer-events:none;z-index:20;font-weight:bold;font-size:17px;animation:pfloat 1.1s ease-out forwards;}
+@keyframes pfloat{0%{opacity:1;transform:translateY(0) scale(1);}100%{opacity:0;transform:translateY(-85px) scale(.6);}}
+#moon{position:absolute;top:18px;right:70px;font-size:36px;animation:mglow 4s ease-in-out infinite;pointer-events:none;}
+@keyframes mglow{0%,100%{filter:drop-shadow(0 0 14px rgba(255,220,100,.4));}50%{filter:drop-shadow(0 0 28px rgba(255,220,100,.8));}}
+#click-hint{position:absolute;bottom:250px;left:50%;transform:translateX(-50%);font-size:12px;color:rgba(255,255,255,.4);pointer-events:none;animation:blink 2s ease-in-out infinite;white-space:nowrap;transition:opacity .5s;}
+@keyframes blink{0%,100%{opacity:.4;}50%{opacity:.8;}}
+@keyframes lvflash{0%{box-shadow:inset 0 0 0 rgba(255,215,0,0);}35%{box-shadow:inset 0 0 90px rgba(255,215,0,.35);}100%{box-shadow:inset 0 0 0 rgba(255,215,0,0);}}
+#scene.lv-flash{animation:lvflash 1s ease-out;}
+
+/* RIGHT */
+#right{background:var(--panel);border-left:2px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
+#shop-header{padding:10px 12px 6px;border-bottom:1px solid var(--border);flex-shrink:0;}
+#shop-header h3{font-size:13px;color:var(--accent);font-weight:bold;}
+#upgrades-list{flex:1;overflow-y:auto;padding:8px;display:flex;flex-direction:column;gap:5px;}
+.upg-card{background:rgba(255,255,255,.03);border:1px solid rgba(92,184,92,.18);border-radius:8px;padding:8px 10px;cursor:pointer;transition:all .15s;}
+.upg-card:hover:not(.no-gold):not(.maxed){background:rgba(92,184,92,.1);border-color:rgba(92,184,92,.45);transform:translateX(-2px);}
+.upg-card.can-buy{border-color:rgba(92,184,92,.38);}
+.upg-card.no-gold{opacity:.5;cursor:not-allowed;}
+.upg-card.maxed{opacity:.5;border-color:rgba(255,215,0,.3);cursor:default;}
+.upg-card.locked{display:none;}
+.upg-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:2px;}
+.upg-name{font-size:13px;font-weight:bold;}
+.upg-lvs{font-size:10px;color:var(--accent);}
+.upg-desc{font-size:11px;color:var(--muted);margin-bottom:4px;}
+.upg-cost{font-size:12px;color:var(--gold);}
+.upg-max{font-size:12px;color:var(--gold);}
+#prestige-section{padding:8px;border-top:1px solid var(--border);flex-shrink:0;}
+#prestige-btn{width:100%;padding:8px;background:linear-gradient(135deg,#4a0070,#c2185b);border:none;color:#fff;border-radius:6px;cursor:pointer;font-size:12px;font-weight:bold;transition:all .2s;}
+#prestige-btn:hover:not(:disabled){opacity:.88;transform:scale(1.01);}
+#prestige-btn:disabled{opacity:.3;cursor:not-allowed;transform:none;}
+#prestige-info{text-align:center;font-size:10px;color:var(--muted);margin-top:4px;}
+
+/* NOTIFICATIONS */
+#notifs{position:fixed;top:58px;right:14px;z-index:100;display:flex;flex-direction:column;gap:5px;pointer-events:none;}
+.notif{background:rgba(5,28,5,.97);border:1px solid var(--accent);border-radius:8px;padding:7px 13px;font-size:13px;max-width:240px;animation:nslide .3s ease-out;}
+@keyframes nslide{from{opacity:0;transform:translateX(60px);}to{opacity:1;transform:translateX(0);}}
+.notif-gold{border-color:var(--gold);}
+.notif-lv{border-color:#e040fb;font-weight:bold;}
+
+/* MODAL */
+#modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.87);z-index:200;align-items:center;justify-content:center;}
+#modal-overlay.show{display:flex;}
+.modal{background:#0a1f0a;border:2px solid var(--accent);border-radius:16px;padding:30px;text-align:center;max-width:360px;width:90%;}
+.modal h2{color:var(--accent);font-size:21px;margin-bottom:10px;}
+.modal-deer{font-size:80px;display:block;margin:10px 0;}
+.modal p{color:var(--muted);font-size:14px;margin-bottom:6px;}
+.modal-reward{font-size:20px;color:var(--grass);font-weight:bold;margin:10px 0;}
+.modal-btn{margin-top:14px;background:var(--accent);color:#0a1f0a;border:none;padding:10px 30px;border-radius:22px;cursor:pointer;font-size:15px;font-weight:bold;transition:all .2s;}
+.modal-btn:hover{opacity:.85;transform:scale(1.03);}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+</style>
+</head>
+<body>
+
+<div id="topbar">
+  <div class="res">
+    <span class="res-icon">🌿</span>
+    <div class="res-info">
+      <span class="res-val grass-val" id="r-grass">0</span>
+      <span class="res-rate" id="r-gps">+1.0/초</span>
+    </div>
+  </div>
+  <div class="res">
+    <span class="res-icon">⭐</span>
+    <div class="res-info">
+      <span class="res-val exp-val" id="r-exp">0 / 50</span>
+      <span class="res-rate" id="r-eps">+1.0/초</span>
+    </div>
+  </div>
+  <div class="res">
+    <span class="res-icon">💰</span>
+    <div class="res-info">
+      <span class="res-val gold-val" id="r-gold">0</span>
+      <span class="res-rate" id="r-gpc">+1/클릭</span>
+    </div>
+  </div>
+  <button id="save-btn" onclick="saveGame()">💾 저장</button>
+</div>
+
+<div id="main">
+  <!-- LEFT -->
+  <div id="left">
+    <div class="tab-bar">
+      <div class="tab active" onclick="switchTab('deer')">🦌 고라니</div>
+      <div class="tab" onclick="switchTab('stats')">📊 통계</div>
+      <div class="tab" onclick="switchTab('achieve')">🏆 업적</div>
+    </div>
+    <div class="tab-content active" id="tab-deer">
+      <div class="panel-section">
+        <div id="deer-portrait">
+          <span id="deer-emoji-left">🦌</span>
+          <div id="deer-name-left">아기 고라니</div>
+          <div id="deer-stage-left">귀엽게 풀을 뜯고 있어요</div>
+        </div>
+      </div>
+      <div class="panel-section">
+        <div class="section-title">레벨 정보</div>
+        <div class="stat-row"><span class="stat-label">레벨</span><span class="stat-val" id="sl-lv">1</span></div>
+        <div class="stat-row"><span class="stat-label">경험치</span><span class="stat-val" id="sl-exp">0 / 50</span></div>
+        <div class="stat-row"><span class="stat-label">총 레벨업</span><span class="stat-val" id="sl-lvups">0회</span></div>
+      </div>
+      <div class="panel-section">
+        <div class="section-title">현재 생산량</div>
+        <div class="stat-row"><span class="stat-label">🌿 풀/초</span><span class="stat-val" id="sl-gps">1.0</span></div>
+        <div class="stat-row"><span class="stat-label">⭐ EXP/초</span><span class="stat-val" id="sl-eps">1.0</span></div>
+        <div class="stat-row"><span class="stat-label">💰 클릭당 골드</span><span class="stat-val" id="sl-gpc">1</span></div>
+        <div class="stat-row"><span class="stat-label">💰 자동 골드/초</span><span class="stat-val" id="sl-agps">0</span></div>
+      </div>
+      <div class="panel-section">
+        <div class="section-title">환생</div>
+        <div class="stat-row"><span class="stat-label">환생 횟수</span><span class="stat-val" id="sl-pr">0</span></div>
+        <div class="stat-row"><span class="stat-label">영구 보너스</span><span class="stat-val" id="sl-prb">없음</span></div>
+      </div>
+    </div>
+    <div class="tab-content" id="tab-stats">
+      <div class="section-title">누적 기록</div>
+      <div class="stat-row"><span class="stat-label">총 풀 생산</span><span class="stat-val" id="tt-grass">0</span></div>
+      <div class="stat-row"><span class="stat-label">총 골드 획득</span><span class="stat-val" id="tt-gold">0</span></div>
+      <div class="stat-row"><span class="stat-label">총 클릭 수</span><span class="stat-val" id="tt-clicks">0</span></div>
+      <div class="stat-row"><span class="stat-label">총 업그레이드</span><span class="stat-val" id="tt-upgs">0</span></div>
+      <div class="stat-row"><span class="stat-label">플레이 시간</span><span class="stat-val" id="tt-time">0분</span></div>
+    </div>
+    <div class="tab-content" id="tab-achieve"></div>
+  </div>
+
+  <!-- SCENE -->
+  <div id="scene" onclick="clickScene(event)">
+    <div id="sky"></div>
+    <div id="moon">🌙</div>
+    <div class="bg-tree" style="left:4%;--sz:65px;--sw:6s;--sd:0s">🌲</div>
+    <div class="bg-tree" style="left:13%;--sz:82px;--sw:5s;--sd:.5s">🌲</div>
+    <div class="bg-tree" style="left:23%;--sz:52px;--sw:7s;--sd:1s">🌿</div>
+    <div class="bg-tree" style="left:74%;--sz:72px;--sw:5.5s;--sd:.3s">🌲</div>
+    <div class="bg-tree" style="left:84%;--sz:88px;--sw:6.5s;--sd:.8s">🌲</div>
+    <div class="bg-tree" style="left:93%;--sz:58px;--sw:4.5s;--sd:1.2s">🌿</div>
+    <div class="tuft" style="left:16%">🌱</div>
+    <div class="tuft" style="left:31%">🌾</div>
+    <div class="tuft" style="left:62%">🌱</div>
+    <div class="tuft" style="left:78%">🌾</div>
+    <div id="ground"></div>
+    <div id="deer">
+      <span id="deer-emoji">🦌</span>
+      <span id="nametag">Lv.1 아기 고라니</span>
+    </div>
+    <div id="scene-expbar">
+      <div id="scene-explabel">⭐ EXP 0 / 50</div>
+      <div class="bar-track"><div id="exp-fill"></div></div>
+    </div>
+    <div id="click-hint">🖱️ 고라니를 클릭해서 골드를 획득하세요!</div>
+  </div>
+
+  <!-- RIGHT -->
+  <div id="right">
+    <div id="shop-header"><h3>🏪 업그레이드 상점</h3></div>
+    <div id="upgrades-list"></div>
+    <div id="prestige-section">
+      <button id="prestige-btn" disabled onclick="doPrestige()">✨ 환생하기 (Lv.30 필요)</button>
+      <div id="prestige-info">환생하면 초기화되지만 영구 보너스를 얻습니다</div>
+    </div>
+  </div>
+</div>
+
+<div id="notifs"></div>
+
+<div id="modal-overlay">
+  <div class="modal">
+    <h2>🦌 돌아오셨군요!</h2>
+    <span class="modal-deer" id="modal-deer">🦌</span>
+    <p id="modal-text">오랫동안 혼자 풀을 먹었어요!</p>
+    <div class="modal-reward" id="modal-reward">+0 🌿</div>
+    <button class="modal-btn" onclick="closeModal()">고마워요! 🌿</button>
+  </div>
+</div>
+
+<script>
+// ── STATE ──────────────────────────────────────────────────────
+const S = {
+  grass:0, gold:0, exp:0,
+  totalGrass:0, totalGold:0, totalClicks:0, totalUpgrades:0, totalLevelups:0,
+  level:1, prestige:0,
+  startTime:Date.now(), lastSave:Date.now(),
+  upgrades:{fast_legs:0,big_stomach:0,sharp_horns:0,mushroom:0,new_pasture:0,
+             deer_call:0,pack_life:0,magic_spring:0,forest_king:0,golden_horns:0},
+  achievements:{},
+};
+
+// ── UPGRADES ───────────────────────────────────────────────────
+const UPGRADES = [
+  {id:'fast_legs',    icon:'🦵', name:'빠른 발',     maxLv:10, unlockLv:1,
+   desc:lv=>`풀 +${lv+1}/초`,            cost:lv=>Math.floor(10*Math.pow(2.2,lv))},
+  {id:'big_stomach',  icon:'🪨', name:'큰 위장',     maxLv:10, unlockLv:1,
+   desc:lv=>`EXP 배율 +${((lv+1)*0.5).toFixed(1)}x`, cost:lv=>Math.floor(15*Math.pow(2.5,lv))},
+  {id:'sharp_horns',  icon:'🦣', name:'날카로운 뿔', maxLv:10, unlockLv:1,
+   desc:lv=>`클릭 골드 +${(lv+1)*2}`,   cost:lv=>Math.floor(20*Math.pow(2.2,lv))},
+  {id:'mushroom',     icon:'🍄', name:'버섯 채취',   maxLv:8,  unlockLv:3,
+   desc:lv=>`자동 골드 +${(lv+1)*2}/초`, cost:lv=>Math.floor(50*Math.pow(2.5,lv))},
+  {id:'new_pasture',  icon:'🌾', name:'새 방목지',   maxLv:8,  unlockLv:5,
+   desc:lv=>`풀 +${(lv+1)*5}/초`,        cost:lv=>Math.floor(100*Math.pow(3,lv))},
+  {id:'deer_call',    icon:'📣', name:'고라니 부름', maxLv:8,  unlockLv:4,
+   desc:lv=>`클릭 풀 +${(lv+1)*3}`,     cost:lv=>Math.floor(30*Math.pow(2.2,lv))},
+  {id:'pack_life',    icon:'🦌', name:'무리 생활',   maxLv:5,  unlockLv:8,
+   desc:lv=>`자동 클릭 +${lv+1}회/5초`, cost:lv=>Math.floor(200*Math.pow(3.5,lv))},
+  {id:'magic_spring', icon:'💧', name:'마법의 샘',   maxLv:3,  unlockLv:12,
+   desc:lv=>`풀 생산 전체 ×${Math.pow(2,lv+1)}`, cost:lv=>Math.floor(1000*Math.pow(8,lv))},
+  {id:'forest_king',  icon:'👑', name:'숲의 왕',     maxLv:5,  unlockLv:15,
+   desc:lv=>`모든 생산 +${(lv+1)*25}%`, cost:lv=>Math.floor(500*Math.pow(5,lv))},
+  {id:'golden_horns', icon:'✨', name:'황금 뿔',     maxLv:3,  unlockLv:20,
+   desc:lv=>`골드 획득 ×${Math.pow(2,lv+1)}`, cost:lv=>Math.floor(2000*Math.pow(8,lv))},
+];
+
+// ── ACHIEVEMENTS ───────────────────────────────────────────────
+const ACHIEVEMENTS = [
+  {id:'start',    icon:'🌱', name:'첫 만남',       desc:'게임을 시작했어요',         check:()=>true},
+  {id:'lv5',      icon:'⭐', name:'초보 사육사',   desc:'레벨 5 달성',               check:()=>S.level>=5},
+  {id:'lv10',     icon:'🌟', name:'성장하는 고라니',desc:'레벨 10 달성',             check:()=>S.level>=10},
+  {id:'lv20',     icon:'💫', name:'전설의 사육사', desc:'레벨 20 달성',              check:()=>S.level>=20},
+  {id:'lv30',     icon:'🔱', name:'고라니의 왕',   desc:'레벨 30 달성',              check:()=>S.level>=30},
+  {id:'grass1k',  icon:'🌿', name:'풀 수집가',     desc:'풀 1,000개 생산',           check:()=>S.totalGrass>=1000},
+  {id:'grass100k',icon:'🌾', name:'풀밭 정복자',   desc:'풀 100,000개 생산',         check:()=>S.totalGrass>=100000},
+  {id:'click100', icon:'👆', name:'열정적인 사육사',desc:'100번 클릭',               check:()=>S.totalClicks>=100},
+  {id:'click1k',  icon:'🖱️', name:'클릭왕',         desc:'1,000번 클릭',             check:()=>S.totalClicks>=1000},
+  {id:'gold1k',   icon:'💰', name:'부자 고라니',   desc:'골드 1,000 모으기',         check:()=>S.totalGold>=1000},
+  {id:'gold10k',  icon:'💎', name:'골드 부자',     desc:'골드 10,000 모으기',        check:()=>S.totalGold>=10000},
+  {id:'upg5',     icon:'🔧', name:'업그레이드 입문',desc:'업그레이드 5회 구매',      check:()=>S.totalUpgrades>=5},
+  {id:'upg20',    icon:'⚙️', name:'업그레이드 마스터',desc:'업그레이드 20회 구매',   check:()=>S.totalUpgrades>=20},
+  {id:'pr1',      icon:'✨', name:'환생의 시작',   desc:'첫 번째 환생',              check:()=>S.prestige>=1},
+  {id:'pr3',      icon:'🔮', name:'환생 전문가',   desc:'3번 환생',                  check:()=>S.prestige>=3},
+];
+
+// ── STAGES ─────────────────────────────────────────────────────
+const STAGES = [
+  {min:1,  max:4,  emoji:'🦌', name:'아기 고라니',   desc:'귀엽게 풀을 뜯고 있어요'},
+  {min:5,  max:9,  emoji:'🦌', name:'어린 고라니',   desc:'조금씩 성장하고 있어요'},
+  {min:10, max:19, emoji:'🦌', name:'청년 고라니',   desc:'활발하게 뛰어다녀요'},
+  {min:20, max:29, emoji:'🦌', name:'어른 고라니',   desc:'당당하게 숲을 누벼요'},
+  {min:30, max:39, emoji:'🦌', name:'고라니 왕 👑',  desc:'숲의 왕이 되었어요!'},
+  {min:40, max:49, emoji:'🦌', name:'전설의 고라니 ✨',desc:'전설이 되었어요...'},
+  {min:50, max:999,emoji:'🦌', name:'신화급 고라니 🔮',desc:'신화 속 존재가 되었어요'},
+];
+function getStage(){return STAGES.find(s=>S.level>=s.min&&S.level<=s.max)||STAGES[STAGES.length-1];}
+
+// ── RATES ──────────────────────────────────────────────────────
+function gps(){
+  let r=1+S.upgrades.fast_legs+S.upgrades.new_pasture*5;
+  r*=Math.pow(2,S.upgrades.magic_spring);
+  r*=1+S.upgrades.forest_king*.25;
+  r*=1+S.level*.03;
+  r*=1+S.prestige*.5;
+  return r;
+}
+function expMult(){
+  let m=1+S.upgrades.big_stomach*.5;
+  m*=1+S.upgrades.forest_king*.1;
+  m*=1+S.prestige*.3;
+  return m;
+}
+function eps(){return gps()*expMult();}
+function gpc(){
+  let g=1+S.upgrades.sharp_horns*2;
+  g*=Math.pow(2,S.upgrades.golden_horns);
+  g*=1+S.upgrades.forest_king*.1;
+  g*=1+S.prestige*.5;
+  return Math.floor(g);
+}
+function grassClick(){return S.upgrades.deer_call*3;}
+function autoGoldSec(){return S.upgrades.mushroom*2;}
+function autoClickSec(){return S.upgrades.pack_life/5;}
+function expNeeded(lv){return Math.floor(50*lv*Math.pow(1.18,lv-1));}
+
+// ── TICK ───────────────────────────────────────────────────────
+let lastTick=Date.now(), autoClickAcc=0, shopDirty=true;
+
+function tick(){
+  const now=Date.now();
+  const dt=Math.min((now-lastTick)/1000,2);
+  lastTick=now;
+
+  const g=gps()*dt, e=eps()*dt, ag=autoGoldSec()*dt;
+  S.grass+=g; S.exp+=e; S.gold+=ag;
+  S.totalGrass+=g; S.totalGold+=ag;
+
+  autoClickAcc+=autoClickSec()*dt;
+  while(autoClickAcc>=1){
+    autoClickAcc-=1;
+    const ag2=gpc(); S.gold+=ag2; S.totalGold+=ag2;
+  }
+
+  checkLevel(); checkAchievements();
+  render();
+}
+
+// ── LEVEL ──────────────────────────────────────────────────────
+function checkLevel(){
+  const need=expNeeded(S.level);
+  if(S.exp>=need){
+    S.exp-=need; S.level++; S.totalLevelups++;
+    const stage=getStage();
+    notify(`🎉 레벨 ${S.level} 달성! ${stage.name}`,'lv');
+    const sc=document.getElementById('scene');
+    sc.classList.remove('lv-flash'); void sc.offsetWidth; sc.classList.add('lv-flash');
+    bounceDeer();
+    if(S.level>=30) document.getElementById('prestige-btn').disabled=false;
+    shopDirty=true;
+  }
+}
+
+// ── CLICK ──────────────────────────────────────────────────────
+function clickScene(e){
+  const g=gpc(), gr=grassClick();
+  S.gold+=g; S.totalGold+=g; S.totalClicks++;
+  if(gr>0){S.grass+=gr; S.totalGrass+=gr;}
+  bounceDeer();
+  spawnParticle(e,`+${fmt(g)} 💰`);
+  if(gr>0) spawnParticle(e,`+${gr} 🌿`,28);
+}
+
+function bounceDeer(){
+  const d=document.getElementById('deer');
+  d.classList.remove('bounce'); void d.offsetWidth; d.classList.add('bounce');
+  setTimeout(()=>d.classList.remove('bounce'),400);
+}
+
+function spawnParticle(e,text,yOff=0){
+  const rect=document.getElementById('scene').getBoundingClientRect();
+  const p=document.createElement('div');
+  p.className='particle';
+  p.textContent=text;
+  p.style.left=(e.clientX-rect.left-18)+'px';
+  p.style.top=(e.clientY-rect.top-20+yOff)+'px';
+  p.style.color=yOff===0?'#ffd700':'#81c784';
+  document.getElementById('scene').appendChild(p);
+  setTimeout(()=>p.remove(),1100);
+}
+
+// ── SHOP ───────────────────────────────────────────────────────
+function renderShop(){
+  const list=document.getElementById('upgrades-list');
+  list.innerHTML='';
+  UPGRADES.forEach(u=>{
+    const lv=S.upgrades[u.id], maxed=lv>=u.maxLv, locked=S.level<u.unlockLv;
+    const cost=maxed?0:u.cost(lv), canBuy=!maxed&&!locked&&S.gold>=cost;
+    const card=document.createElement('div');
+    card.className=`upg-card ${locked?'locked':maxed?'maxed':canBuy?'can-buy':'no-gold'}`;
+    if(!locked){
+      card.innerHTML=`<div class="upg-top"><div class="upg-name">${u.icon} ${u.name}</div><div class="upg-lvs">${lv}/${u.maxLv}</div></div><div class="upg-desc">${u.desc(lv)}</div>${maxed?'<div class="upg-max">✅ 최대 레벨</div>':`<div class="upg-cost">💰 ${fmt(cost)} 골드</div>`}`;
+      if(!maxed) card.onclick=()=>buyUpgrade(u.id);
+    }
+    list.appendChild(card);
+  });
+  shopDirty=false;
+}
+
+function buyUpgrade(id){
+  const u=UPGRADES.find(x=>x.id===id); if(!u) return;
+  const lv=S.upgrades[id]; if(lv>=u.maxLv) return;
+  const cost=u.cost(lv);
+  if(S.gold<cost){notify('골드가 부족해요! 💸');return;}
+  S.gold-=cost; S.upgrades[id]++; S.totalUpgrades++;
+  notify(`${u.icon} ${u.name} Lv.${S.upgrades[id]} 구매!`);
+  shopDirty=true;
+}
+
+// ── ACHIEVEMENTS ───────────────────────────────────────────────
+function checkAchievements(){
+  ACHIEVEMENTS.forEach(a=>{
+    if(!S.achievements[a.id]&&a.check()){
+      S.achievements[a.id]=true;
+      notify(`🏆 업적 달성: ${a.name}!`,'gold');
+      renderAchievements();
+    }
+  });
+}
+
+function renderAchievements(){
+  const c=document.getElementById('tab-achieve'); c.innerHTML='';
+  ACHIEVEMENTS.forEach(a=>{
+    const d=document.createElement('div');
+    d.className=`achievement ${S.achievements[a.id]?'unlocked':'locked'}`;
+    d.innerHTML=`<div class="ach-icon">${a.icon}</div><div><div class="ach-name">${a.name}</div><div class="ach-desc">${a.desc}</div></div>`;
+    c.appendChild(d);
+  });
+}
+
+// ── RENDER ─────────────────────────────────────────────────────
+let raf=false;
+function render(){if(raf)return;raf=true;requestAnimationFrame(()=>{raf=false;doRender();});}
+
+function doRender(){
+  const g=gps(),e=eps(),gc=gpc(),ag=autoGoldSec();
+  const need=expNeeded(S.level), pct=Math.min(S.exp/need*100,100);
+  const stage=getStage();
+
+  document.getElementById('r-grass').textContent=fmt(S.grass);
+  document.getElementById('r-gps').textContent=`+${fmt(g)}/초`;
+  document.getElementById('r-exp').textContent=`${fmt(S.exp)} / ${fmt(need)}`;
+  document.getElementById('r-eps').textContent=`+${fmt(e)}/초`;
+  document.getElementById('r-gold').textContent=fmt(S.gold);
+  document.getElementById('r-gpc').textContent=`+${fmt(gc)}/클릭`;
+
+  document.getElementById('exp-fill').style.width=pct+'%';
+  document.getElementById('scene-explabel').textContent=`⭐ EXP ${fmt(S.exp)} / ${fmt(need)}`;
+  document.getElementById('deer-emoji').textContent=stage.emoji;
+  document.getElementById('nametag').textContent=`Lv.${S.level} ${stage.name}`;
+
+  document.getElementById('deer-emoji-left').textContent=stage.emoji;
+  document.getElementById('deer-name-left').textContent=stage.name;
+  document.getElementById('deer-stage-left').textContent=stage.desc;
+  document.getElementById('sl-lv').textContent=S.level;
+  document.getElementById('sl-exp').textContent=`${fmt(S.exp)} / ${fmt(need)}`;
+  document.getElementById('sl-lvups').textContent=S.totalLevelups+'회';
+  document.getElementById('sl-gps').textContent=fmt(g);
+  document.getElementById('sl-eps').textContent=fmt(e);
+  document.getElementById('sl-gpc').textContent=fmt(gc);
+  document.getElementById('sl-agps').textContent=fmt(ag);
+  document.getElementById('sl-pr').textContent=S.prestige;
+  document.getElementById('sl-prb').textContent=S.prestige>0?`+${S.prestige*50}% 전체`:'없음';
+
+  const mins=Math.floor((Date.now()-S.startTime)/60000);
+  document.getElementById('tt-grass').textContent=fmt(S.totalGrass);
+  document.getElementById('tt-gold').textContent=fmt(S.totalGold);
+  document.getElementById('tt-clicks').textContent=fmt(S.totalClicks);
+  document.getElementById('tt-upgs').textContent=S.totalUpgrades;
+  document.getElementById('tt-time').textContent=mins>=60?`${Math.floor(mins/60)}시간 ${mins%60}분`:`${mins}분`;
+
+  if(shopDirty) renderShop();
+}
+
+// ── PRESTIGE ───────────────────────────────────────────────────
+function doPrestige(){
+  if(S.level<30)return;
+  if(!confirm(`정말 환생하시겠어요?\n레벨·업그레이드·자원이 초기화됩니다.\n대신 영구 보너스 +50%를 얻습니다!`))return;
+  S.prestige++;
+  S.grass=0;S.gold=0;S.exp=0;S.level=1;S.totalLevelups=0;
+  Object.keys(S.upgrades).forEach(k=>S.upgrades[k]=0);
+  document.getElementById('prestige-btn').disabled=true;
+  notify(`✨ 환생 ${S.prestige}회! 영구 보너스 +${S.prestige*50}%`,'lv');
+  shopDirty=true; checkAchievements();
+}
+
+// ── NOTIFY ─────────────────────────────────────────────────────
+function notify(msg,type=''){
+  const c=document.getElementById('notifs');
+  const el=document.createElement('div');
+  el.className=`notif ${type==='gold'?'notif-gold':type==='lv'?'notif-lv':''}`;
+  el.textContent=msg; c.appendChild(el);
+  setTimeout(()=>el.remove(),3200);
+}
+
+// ── SAVE / LOAD ────────────────────────────────────────────────
+function saveGame(){
+  S.lastSave=Date.now();
+  localStorage.setItem('gorani_v1',JSON.stringify(S));
+  notify('💾 저장 완료!');
+}
+
+function loadGame(){
+  const raw=localStorage.getItem('gorani_v1'); if(!raw)return;
+  try{
+    const d=JSON.parse(raw); Object.assign(S,d);
+    const offSec=Math.min((Date.now()-S.lastSave)/1000,3600*8);
+    if(offSec>60){
+      const og=gps()*offSec, oe=eps()*offSec, oag=autoGoldSec()*offSec;
+      S.grass+=og;S.exp+=oe;S.gold+=oag;S.totalGrass+=og;S.totalGold+=oag;
+      let lvs=0;
+      for(let i=0;i<200;i++){const n=expNeeded(S.level);if(S.exp>=n){S.exp-=n;S.level++;S.totalLevelups++;lvs++;}else break;}
+      const mins=Math.floor(offSec/60), stage=getStage();
+      document.getElementById('modal-deer').textContent=stage.emoji;
+      document.getElementById('modal-text').textContent=`${mins}분 동안 혼자 풀을 먹었어요!${lvs>0?` (레벨 ${lvs}번 상승!)`:''}`;
+      document.getElementById('modal-reward').textContent=`+${fmt(Math.floor(og))} 🌿  +${fmt(Math.floor(oag))} 💰`;
+      document.getElementById('modal-overlay').classList.add('show');
+    }
+    if(S.level>=30) document.getElementById('prestige-btn').disabled=false;
+  }catch(e){console.error(e);}
+}
+
+function closeModal(){document.getElementById('modal-overlay').classList.remove('show');}
+
+// ── UI ─────────────────────────────────────────────────────────
+function switchTab(name){
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',['deer','stats','achieve'][i]===name));
+  document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+}
+
+function fmt(n){
+  n=Math.floor(n);
+  if(n>=1e12)return(n/1e12).toFixed(1)+'T';
+  if(n>=1e9)return(n/1e9).toFixed(1)+'B';
+  if(n>=1e6)return(n/1e6).toFixed(1)+'M';
+  if(n>=1e4)return(n/1e3).toFixed(1)+'K';
+  return n.toLocaleString('ko-KR');
+}
+
+function initStars(){
+  const sky=document.getElementById('sky');
+  for(let i=0;i<40;i++){
+    const s=document.createElement('div'); s.className='star';
+    const sz=Math.random()*2+1;
+    s.style.cssText=`left:${Math.random()*100}%;top:${Math.random()*100}%;width:${sz}px;height:${sz}px;--d:${2+Math.random()*3}s;--dl:${Math.random()*3}s;`;
+    sky.appendChild(s);
+  }
+}
+
+// ── INIT ───────────────────────────────────────────────────────
+window.addEventListener('load',()=>{
+  initStars(); loadGame();
+  renderShop(); renderAchievements();
+  setTimeout(checkAchievements,100);
+  setInterval(tick,100);
+  setInterval(saveGame,30000);
+  document.getElementById('scene').addEventListener('click',()=>{
+    const h=document.getElementById('click-hint');
+    if(h)h.style.opacity='0';
+  },{once:true});
+});
+</script>
+</body>
+</html>
