@@ -3,20 +3,21 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🦌 고라니 목장 - 합치기</title>
+<title>🦌 고라니 목장</title>
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
 :root{
   --bg:#0a1a0a;--panel:rgba(5,18,5,.96);--border:#2a4a2a;
   --accent:#5cb85c;--gold:#ffd700;--grass:#81c784;
   --text:#d4edda;--muted:#6a8a6a;
-  --sel:#00e5ff;--selglow:rgba(0,229,255,.28);
   --ok:#4caf50;--fail:#f44336;--warn:#ff9800;
 }
-body{background:var(--bg);color:var(--text);font-family:'Malgun Gothic','Apple SD Gothic Neo',sans-serif;height:100vh;display:flex;flex-direction:column;overflow:hidden;user-select:none;}
+body{background:var(--bg);color:var(--text);font-family:'Malgun Gothic','Apple SD Gothic Neo',sans-serif;
+  height:100vh;display:flex;flex-direction:column;overflow:hidden;user-select:none;}
 
 /* ── TOP BAR ── */
-#topbar{background:var(--panel);border-bottom:2px solid var(--border);padding:6px 14px;display:flex;align-items:center;gap:0;flex-shrink:0;z-index:10;}
+#topbar{background:var(--panel);border-bottom:2px solid var(--border);padding:6px 14px;
+  display:flex;align-items:center;flex-shrink:0;z-index:10;}
 .res{display:flex;align-items:center;gap:7px;padding:3px 14px;border-right:1px solid var(--border);}
 .res:last-of-type{border-right:none;}
 .res-icon{font-size:18px;}
@@ -24,7 +25,8 @@ body{background:var(--bg);color:var(--text);font-family:'Malgun Gothic','Apple S
 .res-val{font-size:15px;font-weight:bold;line-height:1.1;}
 .res-rate{font-size:10px;color:var(--muted);}
 .grass-val{color:var(--grass);}.gold-val{color:var(--gold);}
-#save-btn{margin-left:auto;background:none;border:1px solid var(--border);color:var(--muted);padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px;transition:all .2s;}
+#save-btn{margin-left:auto;background:none;border:1px solid var(--border);color:var(--muted);
+  padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px;transition:all .2s;}
 #save-btn:hover{border-color:var(--accent);color:var(--text);}
 
 /* ── LAYOUT ── */
@@ -33,62 +35,89 @@ body{background:var(--bg);color:var(--text);font-family:'Malgun Gothic','Apple S
 /* ── LEFT ── */
 #left{background:var(--panel);border-right:2px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;}
 .left-sec{padding:10px 12px;border-bottom:1px solid var(--border);}
-.sec-title{font-size:10px;color:var(--accent);font-weight:bold;letter-spacing:1px;text-transform:uppercase;margin-bottom:7px;}
-.stat-row{display:flex;justify-content:space-between;padding:3px 0;font-size:12px;border-bottom:1px solid rgba(255,255,255,.04);}
-.stat-lbl{color:var(--muted);}
-.stat-val{font-weight:bold;}
-/* stage guide */
-.sg-row{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.04);}
+.sec-title{font-size:10px;color:var(--accent);font-weight:bold;letter-spacing:1px;
+  text-transform:uppercase;margin-bottom:7px;}
+.stat-row{display:flex;justify-content:space-between;padding:3px 0;font-size:12px;
+  border-bottom:1px solid rgba(255,255,255,.04);}
+.stat-lbl{color:var(--muted);}.stat-val{font-weight:bold;}
+/* guide */
+.sg-row{display:flex;align-items:center;gap:8px;padding:5px 0;
+  border-bottom:1px solid rgba(255,255,255,.04);}
 .sg-row:last-child{border-bottom:none;}
-.sg-thumb{width:36px;height:36px;object-fit:contain;border-radius:6px;background:rgba(0,0,0,.35);flex-shrink:0;}
-.sg-emoji{width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:26px;background:rgba(0,0,0,.35);border-radius:6px;flex-shrink:0;}
+.sg-thumb{width:36px;height:36px;object-fit:contain;border-radius:6px;
+  background:rgba(0,0,0,.35);flex-shrink:0;}
+.sg-embox{width:36px;height:36px;display:flex;align-items:center;justify-content:center;
+  font-size:26px;background:rgba(0,0,0,.35);border-radius:6px;flex-shrink:0;}
 .sg-info{flex:1;min-width:0;}
-.sg-name{font-size:11px;font-weight:bold;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sg-name{font-size:11px;font-weight:bold;}
 .sg-sub{font-size:10px;color:var(--muted);}
-.sg-rate-bar{height:4px;background:rgba(255,255,255,.08);border-radius:2px;margin-top:3px;overflow:hidden;}
-.sg-rate-fill{height:100%;border-radius:2px;background:var(--ok);transition:width .3s;}
+.sg-bar{height:4px;background:rgba(255,255,255,.08);border-radius:2px;margin-top:3px;overflow:hidden;}
+.sg-fill{height:100%;border-radius:2px;}
 
 /* ── CENTER ── */
-#center{display:flex;flex-direction:column;overflow:hidden;background:linear-gradient(180deg,#061506 0%,#0d2b0d 55%,#122a0a 100%);}
-#center-hdr{padding:8px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;background:var(--panel);}
+#center{display:flex;flex-direction:column;overflow:hidden;}
+#center-hdr{padding:8px 14px;border-bottom:1px solid var(--border);display:flex;
+  align-items:center;justify-content:space-between;flex-shrink:0;background:var(--panel);}
 #center-hdr h3{font-size:13px;color:var(--accent);}
 #slot-info{font-size:12px;color:var(--muted);}
-#buy-btn{background:linear-gradient(135deg,#1b5e20,#4caf50);border:none;color:#fff;padding:5px 12px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:bold;transition:all .2s;white-space:nowrap;}
+#buy-btn{background:linear-gradient(135deg,#1b5e20,#4caf50);border:none;color:#fff;
+  padding:5px 12px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:bold;
+  transition:all .2s;white-space:nowrap;}
 #buy-btn:hover:not(:disabled){opacity:.85;transform:scale(1.03);}
 #buy-btn:disabled{opacity:.33;cursor:not-allowed;transform:none;}
-#merge-hint{padding:5px 14px;font-size:11px;color:var(--muted);background:rgba(0,0,0,.3);border-bottom:1px solid var(--border);flex-shrink:0;min-height:26px;}
-#merge-hint.active{color:var(--sel);}
-#merge-hint.target{color:var(--warn);}
+#drag-hint{padding:4px 14px;font-size:11px;color:var(--muted);background:rgba(0,0,0,.3);
+  border-bottom:1px solid var(--border);flex-shrink:0;text-align:center;}
 
-#pasture-wrap{flex:1;overflow-y:auto;padding:14px;}
-#pasture-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+/* ── PASTURE ── */
+#pasture{flex:1;position:relative;overflow:hidden;
+  background:linear-gradient(180deg,#061506 0%,#0d2b0d 52%,#132a0b 100%);}
+.bg-tree{position:absolute;bottom:72px;font-size:var(--sz,70px);opacity:.5;pointer-events:none;
+  animation:sway var(--sw,5s) ease-in-out infinite var(--sd,0s);}
+@keyframes sway{0%,100%{transform:rotate(-1.5deg);}50%{transform:rotate(1.5deg) translateX(2px);}}
+.pgrass{position:absolute;bottom:68px;font-size:14px;opacity:.65;pointer-events:none;}
+#pground{position:absolute;bottom:0;left:0;right:0;height:75px;
+  background:linear-gradient(180deg,#1a4a0a 0%,#0d2a06 100%);
+  border-top:3px solid #2d6a1a;pointer-events:none;z-index:1;}
+.star{position:absolute;border-radius:50%;background:#fff;
+  animation:twinkle var(--d,3s) ease-in-out infinite var(--dl,0s);}
+@keyframes twinkle{0%,100%{opacity:.8;}50%{opacity:.1;}}
 
-/* ── DEER SLOT ── */
-.deer-slot{aspect-ratio:1;border-radius:10px;border:2px dashed rgba(92,184,92,.15);background:rgba(0,0,0,.18);display:flex;align-items:center;justify-content:center;transition:border-color .18s,box-shadow .18s,background .18s;}
-.deer-slot.filled{border:2px solid var(--border);background:rgba(5,28,5,.75);cursor:pointer;}
-.deer-slot.filled:hover{border-color:rgba(92,184,92,.5);background:rgba(5,40,5,.9);}
-.deer-slot.selected{border-color:var(--sel)!important;box-shadow:0 0 16px var(--selglow),inset 0 0 16px rgba(0,229,255,.07);animation:selglow 1.6s ease-in-out infinite;}
-.deer-slot.merge-target{border-color:var(--warn)!important;box-shadow:0 0 14px rgba(255,152,0,.35);animation:targetglow 1s ease-in-out infinite;}
-@keyframes selglow{0%,100%{box-shadow:0 0 16px var(--selglow);}50%{box-shadow:0 0 28px var(--selglow),inset 0 0 20px rgba(0,229,255,.12);}}
-@keyframes targetglow{0%,100%{box-shadow:0 0 14px rgba(255,152,0,.35);}50%{box-shadow:0 0 24px rgba(255,152,0,.6);}}
-.empty-icon{font-size:24px;opacity:.12;}
+/* ── DEER ELEMENT ── */
+.deer-el{position:absolute;transform:translate(-50%,-50%);z-index:10;
+  cursor:grab;-webkit-user-drag:none;}
+.deer-el.dragging{cursor:grabbing;z-index:100;}
+.deer-el.dragging .deer-inner{
+  filter:drop-shadow(0 0 14px rgba(255,255,255,.55))!important;
+  transform:scale(1.18)!important;}
+.deer-el.can-merge .deer-inner{animation:mpulse .65s ease-in-out infinite;}
+@keyframes mpulse{0%,100%{filter:drop-shadow(0 0 5px var(--warn));}
+  50%{filter:drop-shadow(0 0 18px var(--warn));}}
 
-/* ── DEER CARD ── */
-.deer-card{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:5px;gap:2px;}
-.dc-imgwrap{width:68%;height:55%;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.dc-imgwrap img{max-width:100%;max-height:100%;object-fit:contain;filter:drop-shadow(0 2px 6px rgba(0,0,0,.7));pointer-events:none;}
-.dc-emoji{font-size:44px;line-height:1;pointer-events:none;}
-.dc-lv{font-size:10px;font-weight:bold;color:var(--accent);}
-.dc-name{font-size:10px;color:var(--muted);text-align:center;line-height:1.2;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.dc-prod{font-size:9px;color:var(--grass);}
+.deer-inner{display:flex;flex-direction:column;align-items:center;gap:3px;
+  transition:filter .15s,transform .15s;
+  animation:dbob var(--bob,.9s) ease-in-out infinite;}
+.deer-el.dragging .deer-inner{animation:none;}
+@keyframes dbob{0%,100%{transform:translateY(0);}50%{transform:translateY(-5px);}}
 
-/* ── RIGHT SHOP ── */
+.deer-inner img{width:64px;height:64px;object-fit:contain;display:block;pointer-events:none;
+  filter:drop-shadow(0 3px 8px rgba(0,0,0,.7));}
+.deer-inner img.err{display:none;}
+.d-fallback{font-size:52px;line-height:1;display:none;pointer-events:none;}
+.deer-inner img.err~.d-fallback{display:block;}
+
+.deer-lv{font-size:10px;font-weight:bold;color:var(--accent);
+  background:rgba(0,0,0,.78);padding:1px 8px;border-radius:10px;
+  pointer-events:none;white-space:nowrap;}
+
+/* ── RIGHT ── */
 #right{background:var(--panel);border-left:2px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
 #shop-hdr{padding:10px 12px 6px;border-bottom:1px solid var(--border);flex-shrink:0;}
 #shop-hdr h3{font-size:13px;color:var(--accent);font-weight:bold;}
 #upg-list{flex:1;overflow-y:auto;padding:8px;display:flex;flex-direction:column;gap:5px;}
-.upg{background:rgba(255,255,255,.03);border:1px solid rgba(92,184,92,.17);border-radius:8px;padding:8px 10px;cursor:pointer;transition:all .14s;}
-.upg:hover:not(.no-gold):not(.maxed){background:rgba(92,184,92,.1);border-color:rgba(92,184,92,.44);transform:translateX(-2px);}
+.upg{background:rgba(255,255,255,.03);border:1px solid rgba(92,184,92,.17);border-radius:8px;
+  padding:8px 10px;cursor:pointer;transition:all .14s;}
+.upg:hover:not(.no-gold):not(.maxed){background:rgba(92,184,92,.1);
+  border-color:rgba(92,184,92,.44);transform:translateX(-2px);}
 .upg.can-buy{border-color:rgba(92,184,92,.36);}
 .upg.no-gold{opacity:.48;cursor:not-allowed;}
 .upg.maxed{opacity:.5;border-color:rgba(255,215,0,.28);cursor:default;}
@@ -97,37 +126,45 @@ body{background:var(--bg);color:var(--text);font-family:'Malgun Gothic','Apple S
 .upg-lvs{font-size:10px;color:var(--accent);}
 .upg-desc{font-size:11px;color:var(--muted);margin-bottom:4px;}
 .upg-cost{font-size:12px;color:var(--gold);}
-.upg-max-lbl{font-size:12px;color:var(--gold);}
+.upg-maxlbl{font-size:12px;color:var(--gold);}
 
 /* ── MERGE MODAL ── */
-#merge-modal-wrap{display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:200;align-items:center;justify-content:center;}
-#merge-modal-wrap.show{display:flex;}
-.m-modal{background:#0a1f0a;border:2px solid var(--accent);border-radius:16px;padding:28px 30px;text-align:center;max-width:340px;width:92%;}
-.m-modal.fail-modal{border-color:var(--fail);}
+#merge-wrap{display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);
+  z-index:500;align-items:center;justify-content:center;}
+#merge-wrap.show{display:flex;}
+.m-modal{background:#0a1f0a;border:2px solid var(--accent);border-radius:16px;
+  padding:28px 30px;text-align:center;max-width:320px;width:92%;}
+.m-modal.fborder{border-color:var(--fail);}
 .m-title{font-size:22px;font-weight:bold;margin-bottom:12px;}
-.m-title.s{color:var(--ok);}
-.m-title.f{color:var(--fail);}
-.m-imgwrap{width:110px;height:110px;margin:8px auto;display:flex;align-items:center;justify-content:center;}
-.m-imgwrap img{max-width:100%;max-height:100%;object-fit:contain;}
-.m-emoji{font-size:84px;display:block;}
+.m-title.s{color:var(--ok);}.m-title.f{color:var(--fail);}
+.m-imgw{width:100px;height:100px;margin:8px auto;display:flex;align-items:center;justify-content:center;}
+.m-imgw img{max-width:100%;max-height:100%;object-fit:contain;
+  filter:drop-shadow(0 4px 12px rgba(0,0,0,.7));}
+.m-emoji{font-size:80px;}
 .m-desc{color:var(--muted);font-size:13px;margin:8px 0 4px;}
 .m-rate{font-size:12px;color:var(--muted);}
-.m-btn{margin-top:16px;border:none;padding:10px 30px;border-radius:22px;cursor:pointer;font-size:15px;font-weight:bold;transition:all .2s;}
+.m-btn{margin-top:16px;border:none;padding:10px 28px;border-radius:22px;
+  cursor:pointer;font-size:15px;font-weight:bold;}
 .m-btn.ok{background:var(--ok);color:#fff;}
 .m-btn.fail{background:var(--fail);color:#fff;}
-.m-btn:hover{opacity:.85;transform:scale(1.03);}
+.m-btn:hover{opacity:.85;}
 
 /* ── OFFLINE MODAL ── */
-#off-modal-wrap{display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:200;align-items:center;justify-content:center;}
-#off-modal-wrap.show{display:flex;}
-.off-modal{background:#0a1f0a;border:2px solid var(--accent);border-radius:16px;padding:28px;text-align:center;max-width:320px;width:92%;}
+#off-wrap{display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);
+  z-index:500;align-items:center;justify-content:center;}
+#off-wrap.show{display:flex;}
+.off-modal{background:#0a1f0a;border:2px solid var(--accent);border-radius:16px;
+  padding:28px;text-align:center;max-width:300px;width:92%;}
 .off-modal h2{color:var(--accent);margin-bottom:10px;font-size:18px;}
 .off-reward{font-size:18px;color:var(--grass);font-weight:bold;margin:10px 0;}
-.off-btn{margin-top:14px;background:var(--accent);color:#0a1f0a;border:none;padding:10px 28px;border-radius:22px;cursor:pointer;font-size:15px;font-weight:bold;}
+.off-btn{margin-top:12px;background:var(--accent);color:#0a1f0a;border:none;
+  padding:10px 26px;border-radius:22px;cursor:pointer;font-size:14px;font-weight:bold;}
 
 /* ── NOTIFICATIONS ── */
-#notifs{position:fixed;top:52px;right:14px;z-index:300;display:flex;flex-direction:column;gap:5px;pointer-events:none;}
-.notif{background:rgba(5,28,5,.97);border:1px solid var(--accent);border-radius:8px;padding:7px 13px;font-size:13px;max-width:240px;animation:nslide .3s ease-out;}
+#notifs{position:fixed;top:52px;right:14px;z-index:600;
+  display:flex;flex-direction:column;gap:5px;pointer-events:none;}
+.notif{background:rgba(5,28,5,.97);border:1px solid var(--accent);border-radius:8px;
+  padding:7px 13px;font-size:13px;max-width:240px;animation:nslide .3s ease-out;}
 @keyframes nslide{from{opacity:0;transform:translateX(60px);}to{opacity:1;transform:translateX(0);}}
 .notif-gold{border-color:var(--gold);}
 .notif-ok{border-color:var(--ok);}
@@ -167,10 +204,10 @@ body{background:var(--bg);color:var(--text);font-family:'Malgun Gothic','Apple S
       <div class="stat-row"><span class="stat-lbl">풀 생산/초</span><span class="stat-val" id="st-gps">0</span></div>
       <div class="stat-row"><span class="stat-lbl">골드 생산/초</span><span class="stat-val" id="st-goldps">0</span></div>
       <div class="stat-row"><span class="stat-lbl">합치기 시도</span><span class="stat-val" id="st-merges">0회</span></div>
-      <div class="stat-row"><span class="stat-lbl">✅ 성공</span><span class="stat-val" id="st-success" style="color:var(--ok)">0회</span></div>
-      <div class="stat-row"><span class="stat-lbl">❌ 실패</span><span class="stat-val" id="st-fails" style="color:var(--fail)">0회</span></div>
-      <div class="stat-row"><span class="stat-lbl">총 풀 생산</span><span class="stat-val" id="st-tgrass">0</span></div>
-      <div class="stat-row"><span class="stat-lbl">총 골드 획득</span><span class="stat-val" id="st-tgold">0</span></div>
+      <div class="stat-row"><span class="stat-lbl">✅ 성공</span><span class="stat-val" id="st-ok" style="color:var(--ok)">0회</span></div>
+      <div class="stat-row"><span class="stat-lbl">❌ 실패</span><span class="stat-val" id="st-fail" style="color:var(--fail)">0회</span></div>
+      <div class="stat-row"><span class="stat-lbl">총 풀 생산</span><span class="stat-val" id="st-tg">0</span></div>
+      <div class="stat-row"><span class="stat-lbl">총 골드 획득</span><span class="stat-val" id="st-tm">0</span></div>
     </div>
     <div class="left-sec">
       <div class="sec-title">🦌 고라니 도감</div>
@@ -185,9 +222,9 @@ body{background:var(--bg);color:var(--text);font-family:'Malgun Gothic','Apple S
       <span id="slot-info">0 / 0 마리</span>
       <button id="buy-btn" onclick="buyDeer()">🦌 구매 (50🌿)</button>
     </div>
-    <div id="merge-hint">같은 단계 고라니 두 마리를 클릭해서 합치세요!</div>
-    <div id="pasture-wrap">
-      <div id="pasture-grid"></div>
+    <div id="drag-hint">🖱️ 같은 단계 고라니에게 드래그해서 놓으면 합치기 시도!</div>
+    <div id="pasture">
+      <div id="pground"></div>
     </div>
   </div>
 
@@ -200,11 +237,11 @@ body{background:var(--bg);color:var(--text);font-family:'Malgun Gothic','Apple S
 
 <div id="notifs"></div>
 
-<!-- MERGE RESULT MODAL -->
-<div id="merge-modal-wrap">
+<!-- MERGE MODAL -->
+<div id="merge-wrap">
   <div class="m-modal" id="m-modal">
-    <div class="m-title" id="m-title">합치기!</div>
-    <div class="m-imgwrap" id="m-imgwrap"></div>
+    <div class="m-title" id="m-title"></div>
+    <div class="m-imgw" id="m-imgw"></div>
     <div class="m-desc" id="m-desc"></div>
     <div class="m-rate" id="m-rate"></div>
     <button class="m-btn" id="m-btn" onclick="closeMerge()">확인</button>
@@ -212,435 +249,554 @@ body{background:var(--bg);color:var(--text);font-family:'Malgun Gothic','Apple S
 </div>
 
 <!-- OFFLINE MODAL -->
-<div id="off-modal-wrap">
+<div id="off-wrap">
   <div class="off-modal">
     <h2>🦌 돌아오셨군요!</h2>
-    <p id="off-text" style="color:var(--muted);font-size:13px;"></p>
+    <p id="off-text" style="color:var(--muted);font-size:13px;margin-bottom:4px;"></p>
     <div class="off-reward" id="off-reward"></div>
     <button class="off-btn" onclick="closeOffline()">고마워요! 🌿</button>
   </div>
 </div>
 
 <script>
-// ══════════════════════════════════════════════════
-// 고라니 단계 설정
-// 이미지 파일을 index.html과 같은 폴더에 저장해주세요:
-//   deer1.png ~ deer5.png
-// ══════════════════════════════════════════════════
+// ══════════════════════════════════════════
+// 설정
+// ══════════════════════════════════════════
+// 이미지 파일: deer1.png ~ deer5.png (index.html 과 같은 폴더)
 const STAGES = [
-  {level:1, img:'deer1.png', emoji:'🦌', name:'아기 고라니',   desc:'귀엽게 뛰어다녀요',    gps:1,   goldps:0.5, mergeRate:0.80},
-  {level:2, img:'deer2.png', emoji:'🦌', name:'어린 고라니',   desc:'조금씩 성장해요',       gps:5,   goldps:2,   mergeRate:0.65},
-  {level:3, img:'deer3.png', emoji:'🦌', name:'청년 고라니',   desc:'활발하게 뛰어다녀요',   gps:18,  goldps:8,   mergeRate:0.45},
-  {level:4, img:'deer4.png', emoji:'🦌', name:'전설 고라니',   desc:'황금빛으로 빛나요!',    gps:65,  goldps:30,  mergeRate:0.25},
-  {level:5, img:'deer5.png', emoji:'🧑', name:'만렙 고라니',   desc:'최강의 고라니! 👑',     gps:250, goldps:110, mergeRate:null},
+  {level:1, img:'deer1.png', emoji:'🦌', name:'아기 고라니',  gps:1,   goldps:0.5, mergeRate:0.80, spd:7},
+  {level:2, img:'deer2.png', emoji:'🦌', name:'어린 고라니',  gps:5,   goldps:2,   mergeRate:0.65, spd:6},
+  {level:3, img:'deer3.png', emoji:'🦌', name:'청년 고라니',  gps:18,  goldps:8,   mergeRate:0.45, spd:8},
+  {level:4, img:'deer4.png', emoji:'🦌', name:'전설 고라니',  gps:65,  goldps:30,  mergeRate:0.25, spd:5},
+  {level:5, img:'deer5.png', emoji:'🧑', name:'만렙 고라니',  gps:250, goldps:110, mergeRate:null, spd:4},
 ];
 
-// ══════════════════════════════════════════════════
-// 업그레이드 설정
-// ══════════════════════════════════════════════════
 const UPGRADES = [
-  {id:'pasture',    icon:'🌾', name:'풀밭 확장',   maxLv:10,
+  {id:'pasture',  icon:'🌾', name:'풀밭 확장',   maxLv:10,
    desc:lv=>`풀 생산 +${(lv+1)*25}%`,
    cost:lv=>Math.floor(40*Math.pow(2.2,lv))},
-  {id:'goldmine',   icon:'⛏️', name:'금광 개발',   maxLv:8,
+  {id:'goldmine', icon:'⛏️', name:'금광 개발',   maxLv:8,
    desc:lv=>`골드 생산 +${(lv+1)*25}%`,
    cost:lv=>Math.floor(60*Math.pow(2.4,lv))},
-  {id:'lucky',      icon:'🍀', name:'행운의 부적', maxLv:5,
+  {id:'lucky',    icon:'🍀', name:'행운의 부적', maxLv:5,
    desc:lv=>`합치기 성공률 +${(lv+1)*4}%`,
    cost:lv=>Math.floor(100*Math.pow(3,lv))},
-  {id:'slots',      icon:'🏡', name:'목장 확장',   maxLv:3,
-   desc:lv=>`슬롯 +4칸 (→ ${8+(lv+1)*4}칸)`,
+  {id:'slots',    icon:'🏡', name:'목장 확장',   maxLv:3,
+   desc:lv=>`최대 고라니 +4마리 (→ ${8+(lv+1)*4}마리)`,
    cost:lv=>Math.floor(250*Math.pow(4,lv))},
-  {id:'forest',     icon:'✨', name:'숲의 마법',   maxLv:3,
-   desc:lv=>`전체 생산 ×${Math.pow(2,lv+1).toFixed(0)}`,
+  {id:'forest',   icon:'✨', name:'숲의 마법',   maxLv:3,
+   desc:lv=>`전체 생산 ×${Math.pow(2,lv+1)}`,
    cost:lv=>Math.floor(600*Math.pow(8,lv))},
-  {id:'autobell',   icon:'🔔', name:'자동 수확',   maxLv:5,
-   desc:lv=>`${(6-lv)}초마다 골드 자동 수확`,
+  {id:'autobell', icon:'🔔', name:'자동 수확',   maxLv:5,
+   desc:lv=>`${6-lv}초마다 골드 자동 수확`,
    cost:lv=>Math.floor(80*Math.pow(2.8,lv))},
 ];
 
-// ══════════════════════════════════════════════════
+// ══════════════════════════════════════════
 // 상태
-// ══════════════════════════════════════════════════
+// ══════════════════════════════════════════
 const S = {
   grass:0, gold:0,
   totalGrass:0, totalGold:0,
   totalMerges:0, totalSuccess:0, totalFails:0,
   deer:[], nextId:1,
-  selectedId:null,
   upgrades:{pasture:0,goldmine:0,lucky:0,slots:0,forest:0,autobell:0},
   startTime:Date.now(), lastSave:Date.now(),
   bellAcc:0, shopDirty:true,
 };
 
-// ══════════════════════════════════════════════════
-// 생산량 계산
-// ══════════════════════════════════════════════════
-function maxSlots(){return 8+S.upgrades.slots*4;}
-function totalGps(){
-  let g=S.deer.reduce((a,d)=>a+STAGES[d.level-1].gps,0);
-  g*=1+S.upgrades.pasture*0.25;
-  g*=Math.pow(2,S.upgrades.forest);
+function maxDeer()    { return 8 + S.upgrades.slots * 4; }
+function totalGps()   {
+  let g = S.deer.reduce((a,d) => a + STAGES[d.level-1].gps, 0);
+  g *= 1 + S.upgrades.pasture * 0.25;
+  g *= Math.pow(2, S.upgrades.forest);
   return g;
 }
 function totalGoldps(){
-  let g=S.deer.reduce((a,d)=>a+STAGES[d.level-1].goldps,0);
-  g*=1+S.upgrades.goldmine*0.25;
-  g*=Math.pow(2,S.upgrades.forest);
+  let g = S.deer.reduce((a,d) => a + STAGES[d.level-1].goldps, 0);
+  g *= 1 + S.upgrades.goldmine * 0.25;
+  g *= Math.pow(2, S.upgrades.forest);
   return g;
 }
-function luckyBonus(){return S.upgrades.lucky*0.04;}
-function buyCost(){return Math.floor(50*Math.pow(1.6,Math.max(0,S.deer.length-1)));}
-function bellInterval(){return 6-S.upgrades.autobell;}  // 초
+function luckyBonus() { return S.upgrades.lucky * 0.04; }
+function buyCost()    { return Math.floor(50 * Math.pow(1.6, Math.max(0, S.deer.length - 1))); }
 
-// ══════════════════════════════════════════════════
-// 틱
-// ══════════════════════════════════════════════════
-let lastTick=Date.now();
-function tick(){
-  const now=Date.now(), dt=Math.min((now-lastTick)/1000,2);
-  lastTick=now;
-
-  const g=totalGps()*dt, gld=totalGoldps()*dt;
-  S.grass+=g; S.totalGrass+=g;
-  S.gold+=gld; S.totalGold+=gld;
-
-  if(S.upgrades.autobell>0){
-    S.bellAcc+=dt;
-    const itv=bellInterval();
-    while(S.bellAcc>=itv){
-      S.bellAcc-=itv;
-      const extra=Math.floor(1+S.upgrades.goldmine*0.3);
-      S.gold+=extra; S.totalGold+=extra;
+// ══════════════════════════════════════════
+// 자원 틱 (100ms)
+// ══════════════════════════════════════════
+let lastTick = Date.now();
+function tick() {
+  const now = Date.now(), dt = Math.min((now - lastTick) / 1000, 2);
+  lastTick = now;
+  const g = totalGps() * dt, gld = totalGoldps() * dt;
+  S.grass += g; S.totalGrass += g;
+  S.gold  += gld; S.totalGold  += gld;
+  if (S.upgrades.autobell > 0) {
+    S.bellAcc += dt;
+    const itv = 6 - S.upgrades.autobell;
+    while (S.bellAcc >= itv) {
+      S.bellAcc -= itv;
+      const e = Math.floor(1 + S.upgrades.goldmine * 0.3);
+      S.gold += e; S.totalGold += e;
     }
   }
   render();
 }
 
-// ══════════════════════════════════════════════════
-// 고라니 구매
-// ══════════════════════════════════════════════════
-function buyDeer(){
-  if(S.deer.length>=maxSlots()){notify('목장이 가득 찼어요! 🏡 목장 확장을 업그레이드하세요.');return;}
-  const cost=buyCost();
-  if(S.grass<cost){notify(`풀이 부족해요! (필요: ${fmt(cost)}🌿)`);return;}
-  S.grass-=cost;
-  S.deer.push({id:S.nextId++,level:1});
-  notify('🦌 아기 고라니가 새로 왔어요!');
-  renderPasture();
-}
-
-// ══════════════════════════════════════════════════
-// 선택 & 합치기
-// ══════════════════════════════════════════════════
-function selectDeer(id){
-  const deer=S.deer.find(d=>d.id===id);
-  if(!deer)return;
-
-  if(S.selectedId===id){
-    S.selectedId=null;
-    updateHint('');
-    renderPasture();
-    return;
-  }
-
-  if(S.selectedId!==null){
-    const sel=S.deer.find(d=>d.id===S.selectedId);
-    if(sel&&sel.level===deer.level){
-      // 합치기 시도!
-      S.selectedId=null;
-      updateHint('');
-      doMerge(sel,deer);
-      return;
+// ══════════════════════════════════════════
+// 고라니 배회 애니메이션 (requestAnimationFrame)
+// ══════════════════════════════════════════
+let lastAnim = Date.now();
+function animLoop() {
+  const now = Date.now(), dt = Math.min((now - lastAnim) / 1000, 0.08);
+  lastAnim = now;
+  S.deer.forEach(d => {
+    if (d.dragging) return;
+    const dx = d.tx - d.x, dy = d.ty - d.y;
+    const dist = Math.sqrt(dx*dx + dy*dy);
+    if (dist < 2.5) {
+      d.wait = (d.wait || 0) - dt;
+      if (d.wait <= 0) {
+        d.tx   = 6  + Math.random() * 88;
+        d.ty   = 6  + Math.random() * 76;
+        d.wait = 1.2 + Math.random() * 3;
+      }
+    } else {
+      const spd = d.spd * dt;
+      const nx = dx/dist*spd, ny = dy/dist*spd;
+      d.flipX = nx < 0;
+      d.x = Math.max(4, Math.min(96, d.x + nx));
+      d.y = Math.max(4, Math.min(86, d.y + ny));
     }
-    // 다른 레벨 → 선택 변경
-  }
-
-  S.selectedId=id;
-  const stage=STAGES[deer.level-1];
-  const rate=Math.min((stage.mergeRate||0)+luckyBonus(),0.95);
-  if(stage.mergeRate===null){
-    updateHint(`👑 ${stage.name} 선택됨 — 최고 단계라 합칠 수 없어요`, 'active');
-  } else {
-    updateHint(`🦌 ${stage.name} 선택 — 같은 단계 고라니를 클릭해서 합치세요! (성공률 ${Math.round(rate*100)}%)`, 'active');
-  }
-  renderPasture();
+    const el = document.getElementById('deer-el-' + d.id);
+    if (!el) return;
+    el.style.left = d.x + '%';
+    el.style.top  = d.y + '%';
+    const img = el.querySelector('img, .d-fallback');
+    if (img) img.style.transform = d.flipX ? 'scaleX(-1)' : 'scaleX(1)';
+  });
+  requestAnimationFrame(animLoop);
 }
 
-function updateHint(msg, cls=''){
-  const h=document.getElementById('merge-hint');
-  h.textContent=msg||'같은 단계 고라니 두 마리를 클릭해서 합치세요!';
-  h.className=cls;
+// ══════════════════════════════════════════
+// 드래그 & 드롭 합치기
+// ══════════════════════════════════════════
+let dragId = null, dragOX = 0, dragOY = 0;
+
+function getPasture() { return document.getElementById('pasture'); }
+
+function startDrag(e, id) {
+  e.preventDefault();
+  e.stopPropagation();
+  dragId = id;
+  const d = S.deer.find(x => x.id === id);
+  if (!d) return;
+  d.dragging = true;
+
+  const cl = e.touches ? e.touches[0] : e;
+  const r  = getPasture().getBoundingClientRect();
+  dragOX   = cl.clientX - r.left - d.x / 100 * r.width;
+  dragOY   = cl.clientY - r.top  - d.y / 100 * r.height;
+
+  document.getElementById('deer-el-' + id).classList.add('dragging');
+
+  // 같은 레벨 고라니 강조
+  const stage = STAGES[d.level - 1];
+  if (stage.mergeRate !== null) {
+    S.deer.forEach(x => {
+      if (x.id !== id && x.level === d.level)
+        document.getElementById('deer-el-' + x.id)?.classList.add('can-merge');
+    });
+  }
 }
 
-function doMerge(a,b){
-  const lvl=a.level;
-  const stage=STAGES[lvl-1];
-  if(stage.mergeRate===null){notify('만렙 고라니는 합칠 수 없어요! 👑');return;}
+function onMove(cx, cy) {
+  if (dragId === null) return;
+  const d = S.deer.find(x => x.id === dragId);
+  if (!d) return;
+  const r = getPasture().getBoundingClientRect();
+  d.x = Math.max(4, Math.min(96, (cx - r.left - dragOX) / r.width  * 100));
+  d.y = Math.max(4, Math.min(86, (cy - r.top  - dragOY) / r.height * 100));
+  const el = document.getElementById('deer-el-' + dragId);
+  if (el) { el.style.left = d.x + '%'; el.style.top = d.y + '%'; }
+}
 
-  const rate=Math.min(stage.mergeRate+luckyBonus(),0.95);
+function onDrop() {
+  if (dragId === null) return;
+  const d = S.deer.find(x => x.id === dragId);
+  S.deer.forEach(x => document.getElementById('deer-el-' + x.id)?.classList.remove('can-merge'));
+  if (!d) { dragId = null; return; }
+  d.dragging = false;
+  document.getElementById('deer-el-' + dragId)?.classList.remove('dragging');
+
+  const target = findMergeTarget(d);
+  dragId = null;
+  if (target) doMerge(d, target);
+}
+
+function findMergeTarget(d) {
+  const p  = getPasture();
+  const pw = p.clientWidth, ph = p.clientHeight;
+  const ax = d.x / 100 * pw, ay = d.y / 100 * ph;
+  const THRESH = 72;
+  return S.deer.find(x => {
+    if (x.id === d.id || x.level !== d.level) return false;
+    const bx = x.x / 100 * pw, by = x.y / 100 * ph;
+    return Math.sqrt((ax-bx)**2 + (ay-by)**2) < THRESH;
+  }) || null;
+}
+
+document.addEventListener('mousemove', e => onMove(e.clientX, e.clientY));
+document.addEventListener('mouseup',   () => onDrop());
+document.addEventListener('touchmove', e => {
+  if (dragId !== null) { e.preventDefault(); onMove(e.touches[0].clientX, e.touches[0].clientY); }
+}, {passive: false});
+document.addEventListener('touchend', () => onDrop());
+
+// ══════════════════════════════════════════
+// 합치기 로직
+// ══════════════════════════════════════════
+function doMerge(a, b) {
+  const stage = STAGES[a.level - 1];
+  if (!stage.mergeRate) { notify('만렙 고라니는 합칠 수 없어요! 👑'); return; }
+
+  const rate = Math.min(stage.mergeRate + luckyBonus(), 0.95);
   S.totalMerges++;
 
-  // 두 마리 제거
-  S.deer=S.deer.filter(d=>d.id!==a.id&&d.id!==b.id);
+  const spawnX = a.x, spawnY = a.y;
+  removeDeer(a.id);
+  removeDeer(b.id);
 
-  if(Math.random()<rate){
+  if (Math.random() < rate) {
     S.totalSuccess++;
-    const newLvl=Math.min(lvl+1,STAGES.length);
-    S.deer.push({id:S.nextId++,level:newLvl});
-    renderPasture();
-    showMergeResult(true, newLvl, rate);
+    const newLvl = Math.min(a.level + 1, STAGES.length);
+    const nd = makeDeerObj(newLvl, spawnX, spawnY);
+    S.deer.push(nd);
+    spawnEl(nd);
+    showMergeModal(true, newLvl, rate);
   } else {
     S.totalFails++;
-    // 한 마리만 돌아옴
-    S.deer.push({id:S.nextId++,level:lvl});
-    renderPasture();
-    showMergeResult(false, lvl, rate);
+    const nd = makeDeerObj(a.level, spawnX, spawnY);
+    S.deer.push(nd);
+    spawnEl(nd);
+    showMergeModal(false, a.level, rate);
   }
+  updateHdr();
+  S.shopDirty = true;
 }
 
-function showMergeResult(success, resultLvl, rate){
-  const stage=STAGES[resultLvl-1];
-  const modal=document.getElementById('m-modal');
-  modal.className='m-modal'+(success?'':' fail-modal');
-  document.getElementById('m-title').textContent=success?'🎉 합치기 성공!':'💔 합치기 실패...';
-  document.getElementById('m-title').className='m-title '+(success?'s':'f');
-  document.getElementById('m-desc').textContent=
-    success?`${stage.name} 등장!`:`아쉽게도 고라니 한 마리가 사라졌어요...`;
-  document.getElementById('m-rate').textContent=`성공 확률: ${Math.round(rate*100)}%`;
+// ══════════════════════════════════════════
+// 구매
+// ══════════════════════════════════════════
+function buyDeer() {
+  if (S.deer.length >= maxDeer()) {
+    notify('목장이 가득 찼어요! 🏡 목장 확장을 업그레이드하세요.');
+    return;
+  }
+  const cost = buyCost();
+  if (S.grass < cost) { notify(`풀이 부족해요! (필요: ${fmt(cost)}🌿)`); return; }
+  S.grass -= cost;
+  const d = makeDeerObj(1);
+  S.deer.push(d);
+  spawnEl(d);
+  notify('🦌 아기 고라니가 새로 왔어요!');
+  updateHdr();
+}
 
-  const wrap=document.getElementById('m-imgwrap');
-  wrap.innerHTML='';
-  const img=document.createElement('img');
-  img.src=stage.img;
-  img.style.cssText='max-width:100%;max-height:100%;object-fit:contain;filter:drop-shadow(0 4px 12px rgba(0,0,0,.7));';
-  img.onerror=function(){
-    this.style.display='none';
-    const sp=document.createElement('span');
-    sp.className='m-emoji'; sp.textContent=stage.emoji;
-    wrap.appendChild(sp);
+// ══════════════════════════════════════════
+// 고라니 오브젝트 생성
+// ══════════════════════════════════════════
+function makeDeerObj(level, x, y) {
+  const stage = STAGES[level - 1];
+  return {
+    id: S.nextId++,
+    level,
+    x:    x !== undefined ? x : 10 + Math.random() * 80,
+    y:    y !== undefined ? y : 10 + Math.random() * 76,
+    tx:   10 + Math.random() * 80,
+    ty:   10 + Math.random() * 76,
+    spd:  stage.spd + (Math.random() - 0.5) * 2,
+    wait: 0, flipX: false, dragging: false,
   };
-  wrap.appendChild(img);
-
-  const btn=document.getElementById('m-btn');
-  btn.className='m-btn '+(success?'ok':'fail');
-  btn.textContent=success?'🎊 좋아!':'😢 다음엔 성공할게요';
-  document.getElementById('merge-modal-wrap').classList.add('show');
 }
-function closeMerge(){document.getElementById('merge-modal-wrap').classList.remove('show');}
 
-// ══════════════════════════════════════════════════
-// 목장 렌더링
-// ══════════════════════════════════════════════════
-function renderPasture(){
-  const grid=document.getElementById('pasture-grid');
-  const slots=maxSlots();
-  grid.innerHTML='';
+// ══════════════════════════════════════════
+// DOM – 고라니 요소 생성/제거
+// ══════════════════════════════════════════
+function spawnEl(d) {
+  const stage = STAGES[d.level - 1];
+  const el = document.createElement('div');
+  el.id = 'deer-el-' + d.id;
+  el.className = 'deer-el';
+  el.style.cssText = `left:${d.x}%;top:${d.y}%;--bob:${0.7 + Math.random() * 0.5}s`;
 
-  for(let i=0;i<slots;i++){
-    const deer=S.deer[i]||null;
-    const slot=document.createElement('div');
+  const inner = document.createElement('div');
+  inner.className = 'deer-inner';
+  inner.style.animationDelay = (Math.random() * 0.8) + 's';
 
-    if(deer){
-      const stage=STAGES[deer.level-1];
-      const isSel=S.selectedId===deer.id;
-      const selDeer=S.selectedId!==null?S.deer.find(d=>d.id===S.selectedId):null;
-      const isTgt=selDeer&&selDeer.id!==deer.id&&selDeer.level===deer.level&&stage.mergeRate!==null;
-
-      slot.className='deer-slot filled'+(isSel?' selected':'')+(isTgt?' merge-target':'');
-      slot.onclick=()=>selectDeer(deer.id);
-
-      // 카드
-      const card=document.createElement('div');
-      card.className='deer-card';
-
-      // 이미지
-      const iw=document.createElement('div'); iw.className='dc-imgwrap';
-      const img=document.createElement('img');
-      img.src=stage.img; img.alt=stage.name;
-      img.onerror=function(){
-        this.style.display='none';
-        const em=document.createElement('span');
-        em.className='dc-emoji'; em.textContent=stage.emoji;
-        iw.appendChild(em);
-      };
-      iw.appendChild(img);
-      card.appendChild(iw);
-
-      const lv=document.createElement('div'); lv.className='dc-lv'; lv.textContent='Lv.'+deer.level;
-      const nm=document.createElement('div'); nm.className='dc-name'; nm.textContent=stage.name;
-      const pr=document.createElement('div'); pr.className='dc-prod'; pr.textContent=`+${stage.gps}🌿`;
-      card.appendChild(lv); card.appendChild(nm); card.appendChild(pr);
-      slot.appendChild(card);
-    } else {
-      slot.className='deer-slot';
-      slot.innerHTML='<span class="empty-icon">🌿</span>';
+  const img = document.createElement('img');
+  img.src = stage.img; img.alt = stage.name;
+  img.onerror = function() {
+    this.classList.add('err');
+    if (!this.nextElementSibling || !this.nextElementSibling.classList.contains('d-fallback')) {
+      const fb = document.createElement('span');
+      fb.className = 'd-fallback'; fb.textContent = stage.emoji;
+      this.parentNode.insertBefore(fb, this.nextSibling);
     }
-    grid.appendChild(slot);
+  };
+
+  const lv = document.createElement('div');
+  lv.className = 'deer-lv';
+  lv.textContent = 'Lv.' + d.level;
+
+  inner.appendChild(img);
+  inner.appendChild(lv);
+  el.appendChild(inner);
+
+  el.addEventListener('mousedown', e => startDrag(e, d.id));
+  el.addEventListener('touchstart', e => { e.preventDefault(); startDrag(e, d.id); }, {passive:false});
+
+  getPasture().appendChild(el);
+}
+
+function removeDeer(id) {
+  document.getElementById('deer-el-' + id)?.remove();
+  S.deer = S.deer.filter(d => d.id !== id);
+}
+
+function syncEls() {
+  S.deer.forEach(d => { if (!document.getElementById('deer-el-' + d.id)) spawnEl(d); });
+  document.querySelectorAll('[id^="deer-el-"]').forEach(el => {
+    const id = parseInt(el.id.replace('deer-el-', ''));
+    if (!S.deer.find(d => d.id === id)) el.remove();
+  });
+  updateHdr();
+}
+
+function updateHdr() {
+  const cost = buyCost();
+  document.getElementById('buy-btn').textContent = `🦌 구매 (${fmt(cost)}🌿)`;
+  document.getElementById('buy-btn').disabled = S.deer.length >= maxDeer();
+  document.getElementById('slot-info').textContent = `${S.deer.length} / ${maxDeer()} 마리`;
+}
+
+// ══════════════════════════════════════════
+// 배경 장식
+// ══════════════════════════════════════════
+function initBg() {
+  const p = getPasture();
+  for (let i = 0; i < 35; i++) {
+    const s = document.createElement('div'); s.className = 'star';
+    const sz = Math.random() * 2 + 1;
+    s.style.cssText = `left:${Math.random()*100}%;top:${Math.random()*42}%;`
+      + `width:${sz}px;height:${sz}px;--d:${2+Math.random()*3}s;--dl:${Math.random()*3}s;`;
+    p.appendChild(s);
   }
-
-  // 구매 버튼 갱신
-  const cost=buyCost();
-  const btn=document.getElementById('buy-btn');
-  btn.textContent=`🦌 구매 (${fmt(cost)}🌿)`;
-  btn.disabled=S.deer.length>=maxSlots();
-  document.getElementById('slot-info').textContent=`${S.deer.length} / ${maxSlots()} 마리`;
-}
-
-// ══════════════════════════════════════════════════
-// 상점 렌더링
-// ══════════════════════════════════════════════════
-function renderShop(){
-  const list=document.getElementById('upg-list');
-  list.innerHTML='';
-  UPGRADES.forEach(u=>{
-    const lv=S.upgrades[u.id], maxed=lv>=u.maxLv;
-    const cost=maxed?0:u.cost(lv);
-    const canBuy=!maxed&&S.gold>=cost;
-    const card=document.createElement('div');
-    card.className='upg '+(maxed?'maxed':canBuy?'can-buy':'no-gold');
-    card.innerHTML=
-      `<div class="upg-top"><div class="upg-name">${u.icon} ${u.name}</div><div class="upg-lvs">${lv}/${u.maxLv}</div></div>`+
-      `<div class="upg-desc">${u.desc(lv)}</div>`+
-      (maxed?`<div class="upg-max-lbl">✅ 최대 레벨</div>`:`<div class="upg-cost">💰 ${fmt(cost)} 골드</div>`);
-    if(!maxed) card.onclick=()=>buyUpgrade(u.id);
-    list.appendChild(card);
+  [
+    {l:'3%', sz:'65px', sw:'6s', sd:'0s'},
+    {l:'12%',sz:'80px', sw:'5s', sd:'.5s'},
+    {l:'22%',sz:'50px', sw:'7s', sd:'1s'},
+    {l:'75%',sz:'72px', sw:'5.5s',sd:'.3s'},
+    {l:'86%',sz:'88px', sw:'6.5s',sd:'.8s'},
+    {l:'94%',sz:'54px', sw:'4.5s',sd:'1.2s'},
+  ].forEach(t => {
+    const el = document.createElement('div'); el.className = 'bg-tree';
+    el.style.cssText = `left:${t.l};--sz:${t.sz};--sw:${t.sw};--sd:${t.sd}`;
+    el.textContent = '🌲'; p.appendChild(el);
   });
-  S.shopDirty=false;
+  [16, 33, 52, 70, 84].forEach(pct => {
+    const g = document.createElement('div'); g.className = 'pgrass';
+    g.style.left = pct + '%';
+    g.textContent = Math.random() > .5 ? '🌱' : '🌾';
+    p.appendChild(g);
+  });
 }
 
-function buyUpgrade(id){
-  const u=UPGRADES.find(x=>x.id===id); if(!u)return;
-  const lv=S.upgrades[id]; if(lv>=u.maxLv)return;
-  const cost=u.cost(lv);
-  if(S.gold<cost){notify('골드가 부족해요! 💸');return;}
-  S.gold-=cost; S.upgrades[id]++;
-  notify(`${u.icon} ${u.name} Lv.${S.upgrades[id]} 구매!`,'gold');
-  S.shopDirty=true;
+// ══════════════════════════════════════════
+// 합치기 결과 모달
+// ══════════════════════════════════════════
+function showMergeModal(ok, lvl, rate) {
+  const stage = STAGES[lvl - 1];
+  document.getElementById('m-modal').className = 'm-modal' + (ok ? '' : ' fborder');
+  document.getElementById('m-title').textContent = ok ? '🎉 합치기 성공!' : '💔 합치기 실패...';
+  document.getElementById('m-title').className   = 'm-title ' + (ok ? 's' : 'f');
+  document.getElementById('m-desc').textContent  =
+    ok ? `${stage.name} 등장!` : `고라니 한 마리가 사라졌어요...`;
+  document.getElementById('m-rate').textContent  = `성공 확률: ${Math.round(rate * 100)}%`;
+
+  const w = document.getElementById('m-imgw'); w.innerHTML = '';
+  const img = document.createElement('img');
+  img.src = stage.img;
+  img.onerror = () => {
+    img.style.display = 'none';
+    const sp = document.createElement('span'); sp.className = 'm-emoji';
+    sp.textContent = stage.emoji; w.appendChild(sp);
+  };
+  w.appendChild(img);
+
+  const btn = document.getElementById('m-btn');
+  btn.className   = 'm-btn ' + (ok ? 'ok' : 'fail');
+  btn.textContent = ok ? '🎊 좋아!' : '😢 다음엔 성공!';
+  document.getElementById('merge-wrap').classList.add('show');
+}
+function closeMerge()  { document.getElementById('merge-wrap').classList.remove('show'); }
+function closeOffline(){ document.getElementById('off-wrap').classList.remove('show'); }
+
+// ══════════════════════════════════════════
+// 상점
+// ══════════════════════════════════════════
+function renderShop() {
+  const list = document.getElementById('upg-list'); list.innerHTML = '';
+  UPGRADES.forEach(u => {
+    const lv = S.upgrades[u.id], maxed = lv >= u.maxLv;
+    const cost = maxed ? 0 : u.cost(lv), canBuy = !maxed && S.gold >= cost;
+    const c = document.createElement('div');
+    c.className = 'upg ' + (maxed ? 'maxed' : canBuy ? 'can-buy' : 'no-gold');
+    c.innerHTML =
+      `<div class="upg-top"><div class="upg-name">${u.icon} ${u.name}</div>`
+      + `<div class="upg-lvs">${lv}/${u.maxLv}</div></div>`
+      + `<div class="upg-desc">${u.desc(lv)}</div>`
+      + (maxed
+        ? `<div class="upg-maxlbl">✅ 최대 레벨</div>`
+        : `<div class="upg-cost">💰 ${fmt(cost)} 골드</div>`);
+    if (!maxed) c.onclick = () => buyUpg(u.id);
+    list.appendChild(c);
+  });
+  S.shopDirty = false;
 }
 
-// ══════════════════════════════════════════════════
-// 도감 렌더링
-// ══════════════════════════════════════════════════
-function renderGuide(){
-  const el=document.getElementById('stage-guide');
-  el.innerHTML='';
-  STAGES.forEach(s=>{
-    const row=document.createElement('div'); row.className='sg-row';
+function buyUpg(id) {
+  const u = UPGRADES.find(x => x.id === id); if (!u) return;
+  const lv = S.upgrades[id]; if (lv >= u.maxLv) return;
+  const cost = u.cost(lv);
+  if (S.gold < cost) { notify('골드가 부족해요! 💸'); return; }
+  S.gold -= cost; S.upgrades[id]++;
+  notify(`${u.icon} ${u.name} Lv.${S.upgrades[id]}!`, 'gold');
+  S.shopDirty = true;
+}
 
-    const img=document.createElement('img');
-    img.src=s.img; img.className='sg-thumb'; img.alt=s.name;
-    img.onerror=function(){
-      this.style.display='none';
-      const em=document.createElement('div'); em.className='sg-emoji'; em.textContent=s.emoji;
-      row.insertBefore(em, this.nextSibling);
+// ══════════════════════════════════════════
+// 도감
+// ══════════════════════════════════════════
+function renderGuide() {
+  const el = document.getElementById('stage-guide'); el.innerHTML = '';
+  STAGES.forEach(s => {
+    const row = document.createElement('div'); row.className = 'sg-row';
+    const img = document.createElement('img');
+    img.src = s.img; img.className = 'sg-thumb'; img.alt = s.name;
+    img.onerror = function() {
+      this.style.display = 'none';
+      const b = document.createElement('div'); b.className = 'sg-embox';
+      b.textContent = s.emoji; row.insertBefore(b, this.nextSibling);
     };
-
-    const info=document.createElement('div'); info.className='sg-info';
-    const nm=document.createElement('div'); nm.className='sg-name'; nm.textContent=`Lv.${s.level} ${s.name}`;
-    const sub=document.createElement('div'); sub.className='sg-sub';
-    sub.textContent=s.mergeRate
-      ?`성공률 ${Math.round(s.mergeRate*100)}% | +${s.gps}🌿/초`
-      :`최고 단계 👑 | +${s.gps}🌿/초`;
-    const barWrap=document.createElement('div'); barWrap.className='sg-rate-bar';
-    const barFill=document.createElement('div'); barFill.className='sg-rate-fill';
-    barFill.style.width=(s.mergeRate?s.mergeRate*100:100)+'%';
-    barFill.style.background=s.mergeRate?`hsl(${s.mergeRate*120},70%,45%)`:'var(--gold)';
-    barWrap.appendChild(barFill);
-
-    info.appendChild(nm); info.appendChild(sub); info.appendChild(barWrap);
-    row.appendChild(img); row.appendChild(info);
-    el.appendChild(row);
+    const info = document.createElement('div'); info.className = 'sg-info';
+    const nm   = document.createElement('div'); nm.className = 'sg-name';
+    nm.textContent = `Lv.${s.level} ${s.name}`;
+    const sub  = document.createElement('div'); sub.className = 'sg-sub';
+    sub.textContent = s.mergeRate
+      ? `성공률 ${Math.round(s.mergeRate*100)}% | +${s.gps}🌿/초`
+      : `최고 단계 👑 | +${s.gps}🌿/초`;
+    const bar  = document.createElement('div'); bar.className = 'sg-bar';
+    const fill = document.createElement('div'); fill.className = 'sg-fill';
+    fill.style.cssText = `width:${(s.mergeRate||1)*100}%;`
+      + `background:${s.mergeRate ? `hsl(${s.mergeRate*120},65%,42%)` : 'var(--gold)'}`;
+    bar.appendChild(fill);
+    info.appendChild(nm); info.appendChild(sub); info.appendChild(bar);
+    row.appendChild(img); row.appendChild(info); el.appendChild(row);
   });
 }
 
-// ══════════════════════════════════════════════════
-// 렌더
-// ══════════════════════════════════════════════════
-let raf=false;
-function render(){if(raf)return;raf=true;requestAnimationFrame(()=>{raf=false;doRender();});}
-function doRender(){
-  const g=totalGps(), gld=totalGoldps();
-  document.getElementById('r-grass').textContent=fmt(S.grass);
-  document.getElementById('r-gps').textContent=`+${fmt(g)}/초`;
-  document.getElementById('r-gold').textContent=fmt(S.gold);
-  document.getElementById('r-goldps').textContent=`+${fmt(gld)}/초`;
-
-  document.getElementById('st-count').textContent=S.deer.length+'마리';
-  document.getElementById('st-gps').textContent=fmt(g);
-  document.getElementById('st-goldps').textContent=fmt(gld);
-  document.getElementById('st-merges').textContent=S.totalMerges+'회';
-  document.getElementById('st-success').textContent=S.totalSuccess+'회';
-  document.getElementById('st-fails').textContent=S.totalFails+'회';
-  document.getElementById('st-tgrass').textContent=fmt(Math.floor(S.totalGrass));
-  document.getElementById('st-tgold').textContent=fmt(Math.floor(S.totalGold));
-
-  if(S.shopDirty)renderShop();
+// ══════════════════════════════════════════
+// 렌더 (통계 & 상단바)
+// ══════════════════════════════════════════
+let raf = false;
+function render() { if(raf)return; raf=true; requestAnimationFrame(()=>{raf=false;doRender();}); }
+function doRender() {
+  const g = totalGps(), gld = totalGoldps();
+  document.getElementById('r-grass').textContent  = fmt(S.grass);
+  document.getElementById('r-gps').textContent    = `+${fmt(g)}/초`;
+  document.getElementById('r-gold').textContent   = fmt(S.gold);
+  document.getElementById('r-goldps').textContent = `+${fmt(gld)}/초`;
+  document.getElementById('st-count').textContent = S.deer.length + '마리';
+  document.getElementById('st-gps').textContent   = fmt(g);
+  document.getElementById('st-goldps').textContent= fmt(gld);
+  document.getElementById('st-merges').textContent= S.totalMerges + '회';
+  document.getElementById('st-ok').textContent    = S.totalSuccess + '회';
+  document.getElementById('st-fail').textContent  = S.totalFails + '회';
+  document.getElementById('st-tg').textContent    = fmt(Math.floor(S.totalGrass));
+  document.getElementById('st-tm').textContent    = fmt(Math.floor(S.totalGold));
+  if (S.shopDirty) renderShop();
 }
 
-// ══════════════════════════════════════════════════
+// ══════════════════════════════════════════
 // 저장 / 불러오기
-// ══════════════════════════════════════════════════
-function saveGame(){
-  S.lastSave=Date.now();
-  localStorage.setItem('gorani_merge_v2',JSON.stringify(S));
+// ══════════════════════════════════════════
+function saveGame() {
+  S.lastSave = Date.now();
+  localStorage.setItem('gorani_v3', JSON.stringify(S));
   notify('💾 저장 완료!');
 }
-function loadGame(){
-  const raw=localStorage.getItem('gorani_merge_v2'); if(!raw)return false;
-  try{
-    const d=JSON.parse(raw);
-    Object.assign(S,d);
-    const offSec=Math.min((Date.now()-S.lastSave)/1000,3600*8);
-    if(offSec>60){
-      const g=totalGps()*offSec, gld=totalGoldps()*offSec;
-      S.grass+=g; S.totalGrass+=g; S.gold+=gld; S.totalGold+=gld;
-      const mins=Math.floor(offSec/60);
-      document.getElementById('off-text').textContent=`${mins}분 동안 목장을 비웠어요!`;
-      document.getElementById('off-reward').textContent=`+${fmt(Math.floor(g))} 🌿  +${fmt(Math.floor(gld))} 💰`;
-      document.getElementById('off-modal-wrap').classList.add('show');
+function loadGame() {
+  const raw = localStorage.getItem('gorani_v3'); if (!raw) return false;
+  try {
+    const d = JSON.parse(raw);
+    Object.assign(S, d);
+    const offSec = Math.min((Date.now() - S.lastSave) / 1000, 3600 * 8);
+    if (offSec > 60) {
+      const g = totalGps()*offSec, gld = totalGoldps()*offSec;
+      S.grass += g; S.totalGrass += g; S.gold += gld; S.totalGold += gld;
+      document.getElementById('off-text').textContent = `${Math.floor(offSec/60)}분 동안 목장을 비웠어요!`;
+      document.getElementById('off-reward').textContent = `+${fmt(Math.floor(g))} 🌿  +${fmt(Math.floor(gld))} 💰`;
+      document.getElementById('off-wrap').classList.add('show');
     }
     return true;
-  }catch(e){console.error(e);return false;}
-}
-function closeOffline(){document.getElementById('off-modal-wrap').classList.remove('show');}
-
-// ══════════════════════════════════════════════════
-// 알림
-// ══════════════════════════════════════════════════
-function notify(msg, type=''){
-  const c=document.getElementById('notifs');
-  const el=document.createElement('div');
-  el.className='notif'+(type==='gold'?' notif-gold':type==='ok'?' notif-ok':type==='fail'?' notif-fail':'');
-  el.textContent=msg; c.appendChild(el);
-  setTimeout(()=>el.remove(),3000);
+  } catch(e) { console.error(e); return false; }
 }
 
-// ══════════════════════════════════════════════════
-// 숫자 포맷
-// ══════════════════════════════════════════════════
-function fmt(n){
-  n=Math.floor(n);
-  if(n>=1e12)return(n/1e12).toFixed(1)+'T';
-  if(n>=1e9)return(n/1e9).toFixed(1)+'B';
-  if(n>=1e6)return(n/1e6).toFixed(1)+'M';
-  if(n>=1e4)return(n/1e3).toFixed(1)+'K';
+// ══════════════════════════════════════════
+// 유틸
+// ══════════════════════════════════════════
+function notify(msg, type='') {
+  const c = document.getElementById('notifs');
+  const el = document.createElement('div');
+  el.className = 'notif'
+    + (type==='gold'?' notif-gold':type==='ok'?' notif-ok':type==='fail'?' notif-fail':'');
+  el.textContent = msg; c.appendChild(el);
+  setTimeout(() => el.remove(), 2800);
+}
+function fmt(n) {
+  n = Math.floor(n);
+  if (n >= 1e12) return (n/1e12).toFixed(1)+'T';
+  if (n >= 1e9)  return (n/1e9).toFixed(1)+'B';
+  if (n >= 1e6)  return (n/1e6).toFixed(1)+'M';
+  if (n >= 1e4)  return (n/1e3).toFixed(1)+'K';
   return n.toLocaleString('ko-KR');
 }
 
-// ══════════════════════════════════════════════════
+// ══════════════════════════════════════════
 // 초기화
-// ══════════════════════════════════════════════════
-window.addEventListener('load',()=>{
-  const loaded=loadGame();
-  if(!loaded||S.deer.length===0){
-    S.deer.push({id:S.nextId++,level:1});
+// ══════════════════════════════════════════
+window.addEventListener('load', () => {
+  initBg();
+  const loaded = loadGame();
+  if (!loaded || S.deer.length === 0) {
+    S.deer.push(makeDeerObj(1));
   }
+  // 저장 데이터에 위치 정보 없을 경우 보정
+  S.deer.forEach(d => {
+    if (d.x   === undefined) d.x   = 10 + Math.random() * 80;
+    if (d.y   === undefined) d.y   = 10 + Math.random() * 76;
+    if (d.tx  === undefined) d.tx  = 10 + Math.random() * 80;
+    if (d.ty  === undefined) d.ty  = 10 + Math.random() * 76;
+    if (d.spd === undefined) d.spd = STAGES[d.level-1].spd + (Math.random()-.5)*2;
+    if (d.wait=== undefined) d.wait= 0;
+  });
+  syncEls();
   renderGuide();
-  renderPasture();
   renderShop();
-  setInterval(tick,100);
-  setInterval(saveGame,30000);
+  setInterval(tick, 100);
+  setInterval(saveGame, 30000);
+  requestAnimationFrame(animLoop);
 });
 </script>
 </body>
