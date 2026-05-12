@@ -65,22 +65,34 @@ body{background:var(--bg);color:var(--text);font-family:'Malgun Gothic','Apple S
   transition:all .2s;white-space:nowrap;}
 #buy-btn:hover:not(:disabled){opacity:.85;transform:scale(1.03);}
 #buy-btn:disabled{opacity:.33;cursor:not-allowed;transform:none;}
-#drag-hint{padding:4px 14px;font-size:11px;color:var(--muted);background:rgba(0,0,0,.3);
+#drag-hint{padding:4px 14px;font-size:11px;color:#4a7a2a;background:rgba(200,240,160,.25);
   border-bottom:1px solid var(--border);flex-shrink:0;text-align:center;}
 
 /* ── PASTURE ── */
 #pasture{flex:1;position:relative;overflow:hidden;
-  background:linear-gradient(180deg,#061506 0%,#0d2b0d 52%,#132a0b 100%);}
-.bg-tree{position:absolute;bottom:72px;font-size:var(--sz,70px);opacity:.5;pointer-events:none;
+  background:linear-gradient(180deg,#87ceeb 0%,#b0e0f5 30%,#c8f0a0 55%,#7ec850 100%);}
+/* 땅 */
+#pground{position:absolute;bottom:0;left:0;right:0;height:90px;
+  background:linear-gradient(180deg,#7ec850 0%,#5aaa28 60%,#3d8a10 100%);
+  pointer-events:none;z-index:1;}
+#pfence-l,#pfence-r{position:absolute;bottom:85px;font-size:28px;
+  pointer-events:none;z-index:2;opacity:.85;}
+#pfence-l{left:2%;}#pfence-r{right:2%;}
+/* 구름 */
+.cloud{position:absolute;pointer-events:none;opacity:.88;
+  animation:cfloat var(--cd,18s) linear infinite var(--co,0s);}
+@keyframes cfloat{from{transform:translateX(-140px);}to{transform:translateX(calc(100vw + 140px));}}
+/* 나무 */
+.bg-tree{position:absolute;bottom:84px;font-size:var(--sz,60px);pointer-events:none;
   animation:sway var(--sw,5s) ease-in-out infinite var(--sd,0s);}
 @keyframes sway{0%,100%{transform:rotate(-1.5deg);}50%{transform:rotate(1.5deg) translateX(2px);}}
-.pgrass{position:absolute;bottom:68px;font-size:14px;opacity:.65;pointer-events:none;}
-#pground{position:absolute;bottom:0;left:0;right:0;height:75px;
-  background:linear-gradient(180deg,#1a4a0a 0%,#0d2a06 100%);
-  border-top:3px solid #2d6a1a;pointer-events:none;z-index:1;}
-.star{position:absolute;border-radius:50%;background:#fff;
-  animation:twinkle var(--d,3s) ease-in-out infinite var(--dl,0s);}
-@keyframes twinkle{0%,100%{opacity:.8;}50%{opacity:.1;}}
+/* 꽃/풀 */
+.pgrass{position:absolute;bottom:88px;font-size:16px;opacity:.9;pointer-events:none;}
+/* 햇빛 */
+#psun{position:absolute;top:14px;right:55px;font-size:44px;pointer-events:none;
+  animation:sunpulse 4s ease-in-out infinite;}
+@keyframes sunpulse{0%,100%{filter:drop-shadow(0 0 8px rgba(255,220,0,.5));}
+  50%{filter:drop-shadow(0 0 22px rgba(255,220,0,.9));}}
 
 /* ── DEER ELEMENT ── */
 .deer-el{position:absolute;transform:translate(-50%,-50%);z-index:10;
@@ -225,6 +237,9 @@ body{background:var(--bg);color:var(--text);font-family:'Malgun Gothic','Apple S
     <div id="drag-hint">🖱️ 같은 단계 고라니에게 드래그해서 놓으면 합치기 시도!</div>
     <div id="pasture">
       <div id="pground"></div>
+      <div id="psun">☀️</div>
+      <div id="pfence-l">🪵🪵🪵</div>
+      <div id="pfence-r">🪵🪵🪵</div>
     </div>
   </div>
 
@@ -585,29 +600,39 @@ function updateHdr() {
 // ══════════════════════════════════════════
 function initBg() {
   const p = getPasture();
-  for (let i = 0; i < 35; i++) {
-    const s = document.createElement('div'); s.className = 'star';
-    const sz = Math.random() * 2 + 1;
-    s.style.cssText = `left:${Math.random()*100}%;top:${Math.random()*42}%;`
-      + `width:${sz}px;height:${sz}px;--d:${2+Math.random()*3}s;--dl:${Math.random()*3}s;`;
-    p.appendChild(s);
-  }
+
+  // 구름
+  const cloudEmojis = ['☁️','⛅','🌤️'];
   [
-    {l:'3%', sz:'65px', sw:'6s', sd:'0s'},
-    {l:'12%',sz:'80px', sw:'5s', sd:'.5s'},
-    {l:'22%',sz:'50px', sw:'7s', sd:'1s'},
-    {l:'75%',sz:'72px', sw:'5.5s',sd:'.3s'},
-    {l:'86%',sz:'88px', sw:'6.5s',sd:'.8s'},
-    {l:'94%',sz:'54px', sw:'4.5s',sd:'1.2s'},
+    {top:'8%',  cd:'22s', co:'0s'},
+    {top:'14%', cd:'30s', co:'-8s'},
+    {top:'5%',  cd:'26s', co:'-14s'},
+    {top:'20%', cd:'35s', co:'-4s'},
+  ].forEach(c => {
+    const el = document.createElement('div'); el.className = 'cloud';
+    el.style.cssText = `top:${c.top};--cd:${c.cd};--co:${c.co};font-size:${36+Math.random()*20}px;`;
+    el.textContent = cloudEmojis[Math.floor(Math.random()*cloudEmojis.length)];
+    p.appendChild(el);
+  });
+
+  // 나무 (배경 양 끝)
+  [
+    {l:'1%',  sz:'62px', sw:'6s',  sd:'0s',  em:'🌳'},
+    {l:'9%',  sz:'78px', sw:'5s',  sd:'.5s', em:'🌲'},
+    {l:'88%', sz:'70px', sw:'5.5s',sd:'.3s', em:'🌳'},
+    {l:'95%', sz:'84px', sw:'6.5s',sd:'.8s', em:'🌲'},
   ].forEach(t => {
     const el = document.createElement('div'); el.className = 'bg-tree';
     el.style.cssText = `left:${t.l};--sz:${t.sz};--sw:${t.sw};--sd:${t.sd}`;
-    el.textContent = '🌲'; p.appendChild(el);
+    el.textContent = t.em; p.appendChild(el);
   });
-  [16, 33, 52, 70, 84].forEach(pct => {
+
+  // 꽃과 풀
+  const flora = ['🌸','🌼','🌻','🌷','🌿','🍀','🌺'];
+  [8, 18, 30, 42, 55, 65, 75, 85, 93].forEach(pct => {
     const g = document.createElement('div'); g.className = 'pgrass';
     g.style.left = pct + '%';
-    g.textContent = Math.random() > .5 ? '🌱' : '🌾';
+    g.textContent = flora[Math.floor(Math.random()*flora.length)];
     p.appendChild(g);
   });
 }
