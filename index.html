@@ -29,6 +29,20 @@ body{background:var(--bg);color:var(--text);font-family:'Malgun Gothic','Apple S
   padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px;transition:all .2s;}
 #save-btn:hover{border-color:var(--accent);color:var(--text);}
 
+/* ── 볼륨 컨트롤 ── */
+#vol-ctrl{display:flex;align-items:center;gap:6px;margin-left:12px;padding:0 12px;
+  border-left:1px solid var(--border);}
+#vol-mute{background:none;border:none;font-size:16px;cursor:pointer;padding:0;
+  line-height:1;transition:opacity .2s;}
+#vol-mute:hover{opacity:.7;}
+#vol-slider{-webkit-appearance:none;appearance:none;width:80px;height:4px;
+  border-radius:2px;background:var(--border);cursor:pointer;outline:none;}
+#vol-slider::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;
+  border-radius:50%;background:var(--accent);cursor:pointer;}
+#vol-slider::-moz-range-thumb{width:14px;height:14px;border-radius:50%;
+  background:var(--accent);cursor:pointer;border:none;}
+.vol-label{font-size:10px;color:var(--muted);min-width:28px;}
+
 /* ── LAYOUT ── */
 #main{flex:1;display:grid;grid-template-columns:210px 1fr 255px;overflow:hidden;min-height:0;}
 
@@ -126,10 +140,32 @@ body{background:var(--bg);color:var(--text);font-family:'Malgun Gothic','Apple S
 .ds-lbl{color:var(--muted);}.ds-v{font-weight:bold;}
 
 /* ── MAX LEVEL EFFECT ── */
-#max-flash{display:none;position:absolute;inset:0;pointer-events:none;z-index:150;
-  background:radial-gradient(ellipse at center,rgba(255,215,0,.5) 0%,transparent 70%);}
-#max-flash.show{display:block;animation:mflash .7s ease-out forwards;}
-@keyframes mflash{0%{opacity:1;}100%{opacity:0;}}
+/* 만렙 전체화면 이펙트 */
+#max-flash{display:none;position:fixed;inset:0;pointer-events:none;z-index:400;}
+#max-flash.show{display:block;}
+#max-flash .mf-ray{position:absolute;inset:0;
+  background:conic-gradient(from 0deg,transparent 0%,rgba(255,215,0,.18) 10%,transparent 20%,rgba(255,215,0,.12) 30%,transparent 40%,rgba(255,215,0,.18) 50%,transparent 60%,rgba(255,215,0,.12) 70%,transparent 80%,rgba(255,215,0,.15) 90%,transparent 100%);
+  animation:rayrot 1.2s linear forwards;}
+@keyframes rayrot{0%{transform:rotate(0deg);opacity:1;}100%{transform:rotate(180deg);opacity:0;}}
+#max-flash .mf-ring{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;}
+#max-flash .mf-ring::before,#max-flash .mf-ring::after{content:'';position:absolute;border-radius:50%;
+  border:4px solid rgba(255,215,0,.8);animation:ringout 1s ease-out forwards;}
+#max-flash .mf-ring::before{width:80px;height:80px;animation-delay:0s;}
+#max-flash .mf-ring::after{width:80px;height:80px;animation-delay:.15s;}
+@keyframes ringout{0%{width:80px;height:80px;opacity:1;}100%{width:900px;height:900px;opacity:0;}}
+#max-flash .mf-strobe{position:absolute;inset:0;
+  background:rgba(255,235,100,.55);animation:strobe .6s steps(1) forwards;}
+@keyframes strobe{0%,20%,40%,60%{opacity:1;}10%,30%,50%,70%,100%{opacity:0;}}
+#max-text{display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
+  z-index:410;pointer-events:none;font-size:48px;font-weight:900;
+  color:var(--gold);text-shadow:0 0 30px gold,0 0 60px orange;white-space:nowrap;
+  animation:maxtext 1.8s ease-out forwards;}
+#max-text.show{display:block;}
+@keyframes maxtext{0%{opacity:0;transform:translate(-50%,-50%) scale(.4);}
+  20%{opacity:1;transform:translate(-50%,-50%) scale(1.15);}
+  40%{transform:translate(-50%,-50%) scale(.95);}
+  60%{opacity:1;transform:translate(-50%,-50%) scale(1.05);}
+  100%{opacity:0;transform:translate(-50%,-50%) scale(1.2);}}
 .max-p{position:absolute;pointer-events:none;z-index:160;
   animation:maxfly var(--dur,1.4s) ease-out forwards var(--delay,0s);}
 @keyframes maxfly{0%{opacity:1;transform:translate(-50%,-50%) scale(1);}
@@ -238,6 +274,11 @@ body{background:var(--bg);color:var(--text);font-family:'Malgun Gothic','Apple S
     </div>
   </div>
   <button id="save-btn" onclick="saveGame()">💾 저장</button>
+  <div id="vol-ctrl">
+    <button id="vol-mute" onclick="toggleMute()" title="음소거">🔊</button>
+    <input id="vol-slider" type="range" min="0" max="100" value="50" oninput="setVolume(this.value)">
+    <span class="vol-label" id="vol-pct">50%</span>
+  </div>
 </div>
 
 <div id="main">
@@ -270,7 +311,11 @@ body{background:var(--bg);color:var(--text);font-family:'Malgun Gothic','Apple S
     <div id="drag-hint">🖱️ 같은 단계 고라니에게 드래그해서 놓으면 합치기 시도!</div>
     <div id="pasture">
       <div id="pfence"></div>
-      <div id="max-flash"></div>
+      <div id="max-flash">
+        <div class="mf-strobe"></div>
+        <div class="mf-ray"></div>
+        <div class="mf-ring"></div>
+      </div>
       <!-- 상태 팝업 -->
       <div id="deer-status">
         <div id="ds-imgwrap"><img id="ds-img" src="" alt=""><span id="ds-fb" class="ds-fb" style="display:none"></span></div>
@@ -291,6 +336,7 @@ body{background:var(--bg);color:var(--text);font-family:'Malgun Gothic','Apple S
   </div>
 </div>
 
+<div id="max-text">👑 만렙 고라니 등장!! 👑</div>
 <div id="notifs"></div>
 
 <!-- MERGE MODAL -->
@@ -774,31 +820,39 @@ function closeOffline(){ document.getElementById('off-wrap').classList.remove('s
 function triggerMaxEffect(cx, cy) {
   const p = getPasture();
 
-  // 황금 플래시
-  const flash = document.getElementById('max-flash');
-  flash.className = ''; void flash.offsetWidth; flash.className = 'show';
+  // 사운드
+  playMaxSfx();
 
-  // 파티클 버스트
-  const symbols = ['👑','✨','💫','⭐','🌟','🏆','💛','🎊','🎉'];
-  for (let i = 0; i < 20; i++) {
-    const el    = document.createElement('div');
+  // 전체화면 번쩍 + 방사형 빛줄기 + 링 확장
+  const flash = document.getElementById('max-flash');
+  flash.classList.remove('show'); void flash.offsetWidth; flash.classList.add('show');
+  setTimeout(() => flash.classList.remove('show'), 1400);
+
+  // 중앙 텍스트
+  const txt = document.getElementById('max-text');
+  txt.classList.remove('show'); void txt.offsetWidth; txt.classList.add('show');
+  setTimeout(() => txt.classList.remove('show'), 1900);
+
+  // 파티클 버스트 (많이, 크게)
+  const symbols = ['👑','✨','💫','⭐','🌟','🏆','💛','🎊','🎉','🌈'];
+  for (let i = 0; i < 30; i++) {
+    const el = document.createElement('div');
     el.className = 'max-p';
-    const angle = (i / 20) * Math.PI * 2 + Math.random() * 0.3;
-    const dist  = 70 + Math.random() * 130;
+    const angle = (i / 30) * Math.PI * 2 + Math.random() * 0.4;
+    const dist  = 90 + Math.random() * 200;
     const tx    = Math.cos(angle) * dist;
     const ty    = Math.sin(angle) * dist;
-    const dur   = (1.1 + Math.random() * 0.6).toFixed(2) + 's';
-    const delay = (Math.random() * 0.25).toFixed(2) + 's';
+    const dur   = (1.2 + Math.random() * 0.8).toFixed(2) + 's';
+    const delay = (Math.random() * 0.35).toFixed(2) + 's';
     el.style.cssText =
-      `left:${cx}px;top:${cy}px;font-size:${18+Math.random()*16}px;`+
+      `left:${cx}px;top:${cy}px;font-size:${20+Math.random()*22}px;`+
       `--tx:${tx}px;--ty:${ty}px;--dur:${dur};--delay:${delay};`;
     el.textContent = symbols[Math.floor(Math.random() * symbols.length)];
     p.appendChild(el);
-    setTimeout(() => el.remove(), 2500);
+    setTimeout(() => el.remove(), 2800);
   }
 
-  // 알림
-  notify('👑 만렙 고라니 달성!', 'ok');
+  notify('👑 만렙 고라니 달성!!', 'ok');
 }
 
 // ══════════════════════════════════════════
@@ -933,6 +987,52 @@ function fmt(n) {
 }
 
 // ══════════════════════════════════════════
+// 오디오
+// ══════════════════════════════════════════
+const bgm      = new Audio('bgm.mp3');
+bgm.loop       = true;
+bgm.volume     = 0.5;
+
+const sfxMax   = new Audio('maxlevel.mp3');
+sfxMax.volume  = 0.5;
+
+let muted = false;
+
+function startBgm() {
+  bgm.play().catch(() => {
+    // 자동재생 정책: 첫 클릭 시 재생
+    document.addEventListener('click', () => bgm.play(), { once: true });
+    document.addEventListener('keydown', () => bgm.play(), { once: true });
+  });
+}
+
+function setVolume(val) {
+  const v = val / 100;
+  bgm.volume    = muted ? 0 : v;
+  sfxMax.volume = muted ? 0 : v;
+  document.getElementById('vol-pct').textContent = val + '%';
+  document.getElementById('vol-mute').textContent =
+    muted ? '🔇' : val == 0 ? '🔇' : val < 50 ? '🔉' : '🔊';
+  // 슬라이더 배경 채우기
+  const slider = document.getElementById('vol-slider');
+  slider.style.background =
+    `linear-gradient(to right, var(--accent) ${val}%, var(--border) ${val}%)`;
+}
+
+function toggleMute() {
+  muted = !muted;
+  const val = document.getElementById('vol-slider').value;
+  bgm.volume    = muted ? 0 : val / 100;
+  sfxMax.volume = muted ? 0 : val / 100;
+  document.getElementById('vol-mute').textContent = muted ? '🔇' : val < 50 ? '🔉' : '🔊';
+}
+
+function playMaxSfx() {
+  sfxMax.currentTime = 0;
+  sfxMax.play().catch(() => {});
+}
+
+// ══════════════════════════════════════════
 // 초기화
 // ══════════════════════════════════════════
 window.addEventListener('load', () => {
@@ -953,6 +1053,8 @@ window.addEventListener('load', () => {
   syncEls();
   renderGuide();
   renderShop();
+  setVolume(50); // 슬라이더 초기 색상 적용
+  startBgm();
   setInterval(tick, 100);
   setInterval(saveGame, 30000);
   requestAnimationFrame(animLoop);
