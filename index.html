@@ -68,31 +68,29 @@ body{background:var(--bg);color:var(--text);font-family:'Malgun Gothic','Apple S
 #drag-hint{padding:4px 14px;font-size:11px;color:#4a7a2a;background:rgba(200,240,160,.25);
   border-bottom:1px solid var(--border);flex-shrink:0;text-align:center;}
 
-/* ── PASTURE ── */
-#pasture{flex:1;position:relative;overflow:hidden;
-  background:linear-gradient(180deg,#87ceeb 0%,#b0e0f5 30%,#c8f0a0 55%,#7ec850 100%);}
-/* 땅 */
-#pground{position:absolute;bottom:0;left:0;right:0;height:90px;
-  background:linear-gradient(180deg,#7ec850 0%,#5aaa28 60%,#3d8a10 100%);
+/* ── PASTURE (탑뷰 초원) ── */
+#pasture{
+  flex:1;position:relative;overflow:hidden;
+  /* 잔디 줄무늬 + 원근감 (위=멀리, 아래=가까이) */
+  background-color:#5aaa28;
+  background-image:
+    linear-gradient(180deg,rgba(255,255,255,.13) 0%,transparent 38%,rgba(0,0,0,.12) 100%),
+    repeating-linear-gradient(180deg,
+      transparent 0px,transparent 48px,
+      rgba(0,0,0,.04) 48px,rgba(0,0,0,.04) 96px);
+}
+/* 목장 울타리 */
+#pfence{position:absolute;inset:6px;border:6px solid #7a4f10;border-radius:6px;
+  pointer-events:none;z-index:2;
+  box-shadow:inset 0 0 12px rgba(0,0,0,.15),0 0 0 2px rgba(255,220,130,.25);}
+/* 탑뷰 나무 (원형 그림자) */
+.top-tree{position:absolute;border-radius:50%;pointer-events:none;z-index:3;
+  box-shadow:4px 6px 0 rgba(0,0,0,.25);}
+/* 꽃/풀 패치 (전 영역에 분포) */
+.pgrass{position:absolute;font-size:15px;opacity:.75;pointer-events:none;z-index:3;}
+/* 흙길 */
+.dirt-path{position:absolute;background:rgba(180,130,60,.22);border-radius:50%;
   pointer-events:none;z-index:1;}
-#pfence-l,#pfence-r{position:absolute;bottom:85px;font-size:28px;
-  pointer-events:none;z-index:2;opacity:.85;}
-#pfence-l{left:2%;}#pfence-r{right:2%;}
-/* 구름 */
-.cloud{position:absolute;pointer-events:none;opacity:.88;
-  animation:cfloat var(--cd,18s) linear infinite var(--co,0s);}
-@keyframes cfloat{from{transform:translateX(-140px);}to{transform:translateX(calc(100vw + 140px));}}
-/* 나무 */
-.bg-tree{position:absolute;bottom:84px;font-size:var(--sz,60px);pointer-events:none;
-  animation:sway var(--sw,5s) ease-in-out infinite var(--sd,0s);}
-@keyframes sway{0%,100%{transform:rotate(-1.5deg);}50%{transform:rotate(1.5deg) translateX(2px);}}
-/* 꽃/풀 */
-.pgrass{position:absolute;bottom:88px;font-size:16px;opacity:.9;pointer-events:none;}
-/* 햇빛 */
-#psun{position:absolute;top:14px;right:55px;font-size:44px;pointer-events:none;
-  animation:sunpulse 4s ease-in-out infinite;}
-@keyframes sunpulse{0%,100%{filter:drop-shadow(0 0 8px rgba(255,220,0,.5));}
-  50%{filter:drop-shadow(0 0 22px rgba(255,220,0,.9));}}
 
 /* ── DEER ELEMENT ── */
 .deer-el{position:absolute;transform:translate(-50%,-50%);z-index:10;
@@ -236,10 +234,7 @@ body{background:var(--bg);color:var(--text);font-family:'Malgun Gothic','Apple S
     </div>
     <div id="drag-hint">🖱️ 같은 단계 고라니에게 드래그해서 놓으면 합치기 시도!</div>
     <div id="pasture">
-      <div id="pground"></div>
-      <div id="psun">☀️</div>
-      <div id="pfence-l">🪵🪵🪵</div>
-      <div id="pfence-r">🪵🪵🪵</div>
+      <div id="pfence"></div>
     </div>
   </div>
 
@@ -372,16 +367,16 @@ function animLoop() {
     if (dist < 2.5) {
       d.wait = (d.wait || 0) - dt;
       if (d.wait <= 0) {
-        d.tx   = 6  + Math.random() * 88;
-        d.ty   = 6  + Math.random() * 76;
+        d.tx   = 10 + Math.random() * 80;
+        d.ty   = 10 + Math.random() * 80;
         d.wait = 1.2 + Math.random() * 3;
       }
     } else {
       const spd = d.spd * dt;
       const nx = dx/dist*spd, ny = dy/dist*spd;
       d.flipX = nx < 0;
-      d.x = Math.max(4, Math.min(96, d.x + nx));
-      d.y = Math.max(4, Math.min(86, d.y + ny));
+      d.x = Math.max(8, Math.min(92, d.x + nx));
+      d.y = Math.max(8, Math.min(90, d.y + ny));
     }
     const el = document.getElementById('deer-el-' + d.id);
     if (!el) return;
@@ -527,9 +522,9 @@ function makeDeerObj(level, x, y) {
     id: S.nextId++,
     level,
     x:    x !== undefined ? x : 10 + Math.random() * 80,
-    y:    y !== undefined ? y : 10 + Math.random() * 76,
+    y:    y !== undefined ? y : 10 + Math.random() * 80,
     tx:   10 + Math.random() * 80,
-    ty:   10 + Math.random() * 76,
+    ty:   10 + Math.random() * 80,
     spd:  stage.spd + (Math.random() - 0.5) * 2,
     wait: 0, flipX: false, dragging: false,
   };
@@ -601,40 +596,41 @@ function updateHdr() {
 function initBg() {
   const p = getPasture();
 
-  // 구름
-  const cloudEmojis = ['☁️','⛅','🌤️'];
+  // 탑뷰 나무 (CSS 원형, 울타리 모서리와 가장자리)
   [
-    {top:'8%',  cd:'22s', co:'0s'},
-    {top:'14%', cd:'30s', co:'-8s'},
-    {top:'5%',  cd:'26s', co:'-14s'},
-    {top:'20%', cd:'35s', co:'-4s'},
-  ].forEach(c => {
-    const el = document.createElement('div'); el.className = 'cloud';
-    el.style.cssText = `top:${c.top};--cd:${c.cd};--co:${c.co};font-size:${36+Math.random()*20}px;`;
-    el.textContent = cloudEmojis[Math.floor(Math.random()*cloudEmojis.length)];
-    p.appendChild(el);
+    {x:8,  y:8},  {x:92, y:8},
+    {x:8,  y:90}, {x:92, y:90},
+    {x:50, y:6},  {x:20, y:92}, {x:78, y:92},
+  ].forEach(pos => {
+    const t = document.createElement('div'); t.className = 'top-tree';
+    const sz = 32 + Math.random() * 18;
+    const g  = Math.floor(60 + Math.random() * 40);
+    t.style.cssText =
+      `left:${pos.x}%;top:${pos.y}%;width:${sz}px;height:${sz}px;`+
+      `background:radial-gradient(circle at 35% 30%,hsl(120,${g}%,38%),hsl(120,${g-10}%,20%));`+
+      `transform:translate(-50%,-50%);`;
+    p.appendChild(t);
   });
 
-  // 나무 (배경 양 끝)
-  [
-    {l:'1%',  sz:'62px', sw:'6s',  sd:'0s',  em:'🌳'},
-    {l:'9%',  sz:'78px', sw:'5s',  sd:'.5s', em:'🌲'},
-    {l:'88%', sz:'70px', sw:'5.5s',sd:'.3s', em:'🌳'},
-    {l:'95%', sz:'84px', sw:'6.5s',sd:'.8s', em:'🌲'},
-  ].forEach(t => {
-    const el = document.createElement('div'); el.className = 'bg-tree';
-    el.style.cssText = `left:${t.l};--sz:${t.sz};--sw:${t.sw};--sd:${t.sd}`;
-    el.textContent = t.em; p.appendChild(el);
-  });
+  // 흙길 흔적 (랜덤 타원)
+  for (let i = 0; i < 5; i++) {
+    const d = document.createElement('div'); d.className = 'dirt-path';
+    const w = 40 + Math.random()*60, h = 20 + Math.random()*30;
+    d.style.cssText =
+      `left:${10+Math.random()*80}%;top:${10+Math.random()*80}%;`+
+      `width:${w}px;height:${h}px;transform:translate(-50%,-50%) rotate(${Math.random()*60-30}deg);`;
+    p.appendChild(d);
+  }
 
-  // 꽃과 풀
-  const flora = ['🌸','🌼','🌻','🌷','🌿','🍀','🌺'];
-  [8, 18, 30, 42, 55, 65, 75, 85, 93].forEach(pct => {
+  // 꽃/풀 패치 (전 영역에 분포)
+  const flora = ['🌸','🌼','🌻','🌷','🍀','🌿','🍄','🌺','🌾'];
+  for (let i = 0; i < 18; i++) {
     const g = document.createElement('div'); g.className = 'pgrass';
-    g.style.left = pct + '%';
-    g.textContent = flora[Math.floor(Math.random()*flora.length)];
+    g.style.left = (8 + Math.random() * 84) + '%';
+    g.style.top  = (8 + Math.random() * 84) + '%';
+    g.textContent = flora[Math.floor(Math.random() * flora.length)];
     p.appendChild(g);
-  });
+  }
 }
 
 // ══════════════════════════════════════════
@@ -810,9 +806,9 @@ window.addEventListener('load', () => {
   // 저장 데이터에 위치 정보 없을 경우 보정
   S.deer.forEach(d => {
     if (d.x   === undefined) d.x   = 10 + Math.random() * 80;
-    if (d.y   === undefined) d.y   = 10 + Math.random() * 76;
+    if (d.y   === undefined) d.y   = 10 + Math.random() * 80;
     if (d.tx  === undefined) d.tx  = 10 + Math.random() * 80;
-    if (d.ty  === undefined) d.ty  = 10 + Math.random() * 76;
+    if (d.ty  === undefined) d.ty  = 10 + Math.random() * 80;
     if (d.spd === undefined) d.spd = STAGES[d.level-1].spd + (Math.random()-.5)*2;
     if (d.wait=== undefined) d.wait= 0;
   });
