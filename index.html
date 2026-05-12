@@ -139,6 +139,20 @@ body{background:var(--bg);color:var(--text);font-family:'Malgun Gothic','Apple S
 .ds-row:last-child{border-bottom:none;}
 .ds-lbl{color:var(--muted);}.ds-v{font-weight:bold;}
 
+/* ── 말풍선 ── */
+.speech-bubble{position:absolute;transform:translate(-50%,-100%);margin-top:-14px;
+  background:#fff;color:#222;font-size:12px;font-weight:bold;font-family:'Malgun Gothic',sans-serif;
+  padding:6px 10px;border-radius:14px;white-space:nowrap;pointer-events:none;z-index:50;
+  box-shadow:0 2px 8px rgba(0,0,0,.25);
+  animation:bubblepop .25s cubic-bezier(.34,1.56,.64,1) forwards;}
+.speech-bubble::after{content:'';position:absolute;bottom:-8px;left:50%;transform:translateX(-50%);
+  border:5px solid transparent;border-top-color:#fff;border-bottom:none;}
+@keyframes bubblepop{from{opacity:0;transform:translate(-50%,-100%) scale(.7);}
+  to{opacity:1;transform:translate(-50%,-100%) scale(1);}}
+.speech-bubble.fadeout{animation:bubblefade .4s ease-out forwards;}
+@keyframes bubblefade{from{opacity:1;transform:translate(-50%,-100%) scale(1);}
+  to{opacity:0;transform:translate(-50%,-120%) scale(.9);}}
+
 /* ── MAX LEVEL EFFECT ── */
 /* 만렙 전체화면 이펙트 */
 #max-flash{display:none;position:fixed;inset:0;pointer-events:none;z-index:400;}
@@ -632,6 +646,7 @@ function doMerge(a, b) {
         const el = document.getElementById('deer-el-' + nd.id);
         if (el) { el.classList.add('maxglow'); setTimeout(() => el.classList.remove('maxglow'), 3000); }
       }, 80);
+      setTimeout(() => scheduleBubbles(), 1200);
     }
     showMergeModal(true, newLvl, rate);
   } else {
@@ -987,6 +1002,61 @@ function fmt(n) {
 }
 
 // ══════════════════════════════════════════
+// 만렙 고라니 말풍선
+// ══════════════════════════════════════════
+const MAX_LINES = [
+  '끼에에엑', '맛있당~', '옴뇸뇸', '배고프노',
+  '팁지 ㄱ?', '근로가야함', '토비동산을뛰어다니고싶어..',
+  '풀이 너무 맛있어', '오늘 날씨 좋다', '나 잡아봐라~',
+  '힝 피곤해', '배부르다', '끼야~!',
+];
+
+const bubbleTimers = {}; // id → timerId
+
+function spawnBubble(deer) {
+  const el = document.getElementById('deer-el-' + deer.id);
+  if (!el) return;
+
+  // 기존 말풍선 제거
+  el.querySelectorAll('.speech-bubble').forEach(b => b.remove());
+
+  const bubble = document.createElement('div');
+  bubble.className = 'speech-bubble';
+  bubble.textContent = MAX_LINES[Math.floor(Math.random() * MAX_LINES.length)];
+  bubble.style.left = '50%';
+  bubble.style.top  = '-8px';
+  el.appendChild(bubble);
+
+  // 2.5초 후 페이드아웃
+  setTimeout(() => {
+    bubble.classList.add('fadeout');
+    setTimeout(() => bubble.remove(), 400);
+  }, 2500);
+}
+
+function scheduleBubbles() {
+  S.deer.forEach(d => {
+    if (d.level !== STAGES.length) return;
+    if (bubbleTimers[d.id]) return; // 이미 예약됨
+    const schedNext = () => {
+      const delay = 4000 + Math.random() * 6000; // 4~10초마다
+      bubbleTimers[d.id] = setTimeout(() => {
+        if (!S.deer.find(x => x.id === d.id)) { delete bubbleTimers[d.id]; return; }
+        spawnBubble(d);
+        delete bubbleTimers[d.id];
+        schedNext();
+      }, delay);
+    };
+    // 첫 등장 후 1~3초 뒤 첫 말풍선
+    bubbleTimers[d.id] = setTimeout(() => {
+      delete bubbleTimers[d.id];
+      spawnBubble(d);
+      schedNext();
+    }, 1000 + Math.random() * 2000);
+  });
+}
+
+// ══════════════════════════════════════════
 // 오디오
 // ══════════════════════════════════════════
 const bgm      = new Audio('bgm.mp3');
@@ -1053,8 +1123,9 @@ window.addEventListener('load', () => {
   syncEls();
   renderGuide();
   renderShop();
-  setVolume(50); // 슬라이더 초기 색상 적용
+  setVolume(50);
   startBgm();
+  setTimeout(scheduleBubbles, 2000); // 저장된 만렙 고라니 말풍선 시작
   setInterval(tick, 100);
   setInterval(saveGame, 30000);
   requestAnimationFrame(animLoop);
