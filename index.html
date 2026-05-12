@@ -102,6 +102,38 @@ body{background:var(--bg);color:var(--text);font-family:'Malgun Gothic','Apple S
 .deer-el.can-merge .deer-inner{animation:mpulse .65s ease-in-out infinite;}
 @keyframes mpulse{0%,100%{filter:drop-shadow(0 0 5px var(--warn));}
   50%{filter:drop-shadow(0 0 18px var(--warn));}}
+/* 만렙 등장 글로우 */
+.deer-el.maxglow .deer-inner{animation:maxgl 0.7s ease-in-out 4;}
+@keyframes maxgl{0%,100%{filter:drop-shadow(0 0 6px gold);}50%{filter:drop-shadow(0 0 28px gold);}}
+
+/* ── STATUS POPUP ── */
+#deer-status{display:none;position:absolute;z-index:200;pointer-events:none;
+  background:rgba(4,16,4,.96);border:2px solid var(--accent);border-radius:14px;
+  padding:14px 14px 10px;width:180px;
+  box-shadow:0 6px 24px rgba(0,0,0,.6),0 0 0 1px rgba(92,184,92,.15);}
+#deer-status.show{display:block;animation:dspop .18s cubic-bezier(.34,1.56,.64,1);}
+@keyframes dspop{from{opacity:0;transform:scale(.85);}to{opacity:1;transform:scale(1);}}
+#ds-imgwrap{width:100%;display:flex;justify-content:center;margin-bottom:8px;}
+#ds-imgwrap img{width:100px;height:100px;object-fit:contain;
+  filter:drop-shadow(0 4px 12px rgba(0,0,0,.7));border-radius:8px;}
+#ds-imgwrap .ds-fb{font-size:80px;line-height:1;}
+#ds-lv{font-size:11px;color:var(--accent);font-weight:bold;text-align:center;}
+#ds-name{font-size:14px;font-weight:bold;text-align:center;margin-bottom:6px;
+  color:var(--text);}
+.ds-row{display:flex;justify-content:space-between;padding:3px 0;font-size:11px;
+  border-bottom:1px solid rgba(255,255,255,.05);}
+.ds-row:last-child{border-bottom:none;}
+.ds-lbl{color:var(--muted);}.ds-v{font-weight:bold;}
+
+/* ── MAX LEVEL EFFECT ── */
+#max-flash{display:none;position:absolute;inset:0;pointer-events:none;z-index:150;
+  background:radial-gradient(ellipse at center,rgba(255,215,0,.5) 0%,transparent 70%);}
+#max-flash.show{display:block;animation:mflash .7s ease-out forwards;}
+@keyframes mflash{0%{opacity:1;}100%{opacity:0;}}
+.max-p{position:absolute;pointer-events:none;z-index:160;
+  animation:maxfly var(--dur,1.4s) ease-out forwards var(--delay,0s);}
+@keyframes maxfly{0%{opacity:1;transform:translate(-50%,-50%) scale(1);}
+  100%{opacity:0;transform:translate(calc(-50% + var(--tx)),calc(-50% + var(--ty))) scale(.4);}}
 
 .deer-inner{display:flex;flex-direction:column;align-items:center;gap:3px;
   transition:filter .15s,transform .15s;
@@ -145,6 +177,9 @@ body{background:var(--bg);color:var(--text);font-family:'Malgun Gothic','Apple S
 .m-modal{background:#0a1f0a;border:2px solid var(--accent);border-radius:16px;
   padding:28px 30px;text-align:center;max-width:320px;width:92%;}
 .m-modal.fborder{border-color:var(--fail);}
+.m-modal.maxborder{border-color:var(--gold);box-shadow:0 0 32px rgba(255,215,0,.45);}
+.m-title.max{color:var(--gold);animation:titleglow 1s ease-in-out 3;}
+@keyframes titleglow{0%,100%{text-shadow:none;}50%{text-shadow:0 0 20px gold;}}
 .m-title{font-size:22px;font-weight:bold;margin-bottom:12px;}
 .m-title.s{color:var(--ok);}.m-title.f{color:var(--fail);}
 .m-imgw{width:100px;height:100px;margin:8px auto;display:flex;align-items:center;justify-content:center;}
@@ -235,6 +270,17 @@ body{background:var(--bg);color:var(--text);font-family:'Malgun Gothic','Apple S
     <div id="drag-hint">🖱️ 같은 단계 고라니에게 드래그해서 놓으면 합치기 시도!</div>
     <div id="pasture">
       <div id="pfence"></div>
+      <div id="max-flash"></div>
+      <!-- 상태 팝업 -->
+      <div id="deer-status">
+        <div id="ds-imgwrap"><img id="ds-img" src="" alt=""><span id="ds-fb" class="ds-fb" style="display:none"></span></div>
+        <div id="ds-lv"></div>
+        <div id="ds-name"></div>
+        <div class="ds-row"><span class="ds-lbl">🌿 풀 생산</span><span class="ds-v" id="ds-gps"></span></div>
+        <div class="ds-row"><span class="ds-lbl">💰 골드 생산</span><span class="ds-v" id="ds-gold"></span></div>
+        <div class="ds-row"><span class="ds-lbl">🎲 합치기 성공률</span><span class="ds-v" id="ds-rate"></span></div>
+        <div class="ds-row"><span class="ds-lbl">🦌 전체 보유</span><span class="ds-v" id="ds-total"></span></div>
+      </div>
     </div>
   </div>
 
@@ -418,6 +464,9 @@ function startDrag(e, id) {
         document.getElementById('deer-el-' + x.id)?.classList.add('can-merge');
     });
   }
+
+  // 상태창 표시
+  showDeerStatus(d);
 }
 
 function onMove(cx, cy) {
@@ -429,12 +478,14 @@ function onMove(cx, cy) {
   d.y = Math.max(4, Math.min(86, (cy - r.top  - dragOY) / r.height * 100));
   const el = document.getElementById('deer-el-' + dragId);
   if (el) { el.style.left = d.x + '%'; el.style.top = d.y + '%'; }
+  updateStatusPos(d);
 }
 
 function onDrop() {
   if (dragId === null) return;
   const d = S.deer.find(x => x.id === dragId);
   S.deer.forEach(x => document.getElementById('deer-el-' + x.id)?.classList.remove('can-merge'));
+  hideDeerStatus();
   if (!d) { dragId = null; return; }
   d.dragging = false;
   document.getElementById('deer-el-' + dragId)?.classList.remove('dragging');
@@ -442,6 +493,51 @@ function onDrop() {
   const target = findMergeTarget(d);
   dragId = null;
   if (target) doMerge(d, target);
+}
+
+// ── 상태 팝업 ──────────────────────────────
+function showDeerStatus(d) {
+  const stage = STAGES[d.level - 1];
+  const rate  = stage.mergeRate
+    ? Math.round(Math.min(stage.mergeRate + luckyBonus(), 0.95) * 100) + '%'
+    : '최고 단계 👑';
+  const sameCount = S.deer.filter(x => x.level === d.level).length;
+
+  // 이미지
+  const img = document.getElementById('ds-img');
+  const fb  = document.getElementById('ds-fb');
+  img.src = stage.img; img.style.display = 'block'; fb.style.display = 'none';
+  img.onerror = () => { img.style.display='none'; fb.textContent=stage.emoji; fb.style.display='block'; };
+
+  document.getElementById('ds-lv').textContent    = 'Lv.' + d.level;
+  document.getElementById('ds-name').textContent  = stage.name;
+  document.getElementById('ds-gps').textContent   = '+' + stage.gps + '/초';
+  document.getElementById('ds-gold').textContent  = '+' + stage.goldps + '/초';
+  document.getElementById('ds-rate').textContent  = rate;
+  document.getElementById('ds-total').textContent = sameCount + '마리';
+
+  const el = document.getElementById('deer-status');
+  el.classList.add('show');
+  updateStatusPos(d);
+}
+
+function updateStatusPos(d) {
+  const popup   = document.getElementById('deer-status');
+  if (!popup.classList.contains('show')) return;
+  const p  = getPasture();
+  const pw = p.clientWidth, ph = p.clientHeight;
+  const dx = d.x / 100 * pw, dy = d.y / 100 * ph;
+  const W  = 180, H = 200;
+  let left = dx + 56, top = dy - 100;
+  if (left + W > pw - 8)  left = dx - W - 56;
+  if (top < 8)            top  = 8;
+  if (top + H > ph - 8)   top  = ph - H - 8;
+  popup.style.left = left + 'px';
+  popup.style.top  = top  + 'px';
+}
+
+function hideDeerStatus() {
+  document.getElementById('deer-status').classList.remove('show');
 }
 
 function findMergeTarget(d) {
@@ -483,6 +579,14 @@ function doMerge(a, b) {
     const nd = makeDeerObj(newLvl, spawnX, spawnY);
     S.deer.push(nd);
     spawnEl(nd);
+    if (newLvl === STAGES.length) {
+      const p  = getPasture();
+      triggerMaxEffect(spawnX / 100 * p.clientWidth, spawnY / 100 * p.clientHeight);
+      setTimeout(() => {
+        const el = document.getElementById('deer-el-' + nd.id);
+        if (el) { el.classList.add('maxglow'); setTimeout(() => el.classList.remove('maxglow'), 3000); }
+      }, 80);
+    }
     showMergeModal(true, newLvl, rate);
   } else {
     S.totalFails++;
@@ -637,10 +741,13 @@ function initBg() {
 // 합치기 결과 모달
 // ══════════════════════════════════════════
 function showMergeModal(ok, lvl, rate) {
-  const stage = STAGES[lvl - 1];
-  document.getElementById('m-modal').className = 'm-modal' + (ok ? '' : ' fborder');
-  document.getElementById('m-title').textContent = ok ? '🎉 합치기 성공!' : '💔 합치기 실패...';
-  document.getElementById('m-title').className   = 'm-title ' + (ok ? 's' : 'f');
+  const stage  = STAGES[lvl - 1];
+  const isMax  = ok && lvl === STAGES.length;
+  document.getElementById('m-modal').className =
+    'm-modal' + (isMax ? ' maxborder' : ok ? '' : ' fborder');
+  document.getElementById('m-title').textContent =
+    isMax ? '👑 만렙 고라니 등장!!' : ok ? '🎉 합치기 성공!' : '💔 합치기 실패...';
+  document.getElementById('m-title').className   = 'm-title ' + (ok ? 's' : 'f') + (isMax ? ' max' : '');
   document.getElementById('m-desc').textContent  =
     ok ? `${stage.name} 등장!` : `고라니 한 마리가 사라졌어요...`;
   document.getElementById('m-rate').textContent  = `성공 확률: ${Math.round(rate * 100)}%`;
@@ -662,6 +769,37 @@ function showMergeModal(ok, lvl, rate) {
 }
 function closeMerge()  { document.getElementById('merge-wrap').classList.remove('show'); }
 function closeOffline(){ document.getElementById('off-wrap').classList.remove('show'); }
+
+// ── 만렙 이펙트 ────────────────────────────
+function triggerMaxEffect(cx, cy) {
+  const p = getPasture();
+
+  // 황금 플래시
+  const flash = document.getElementById('max-flash');
+  flash.className = ''; void flash.offsetWidth; flash.className = 'show';
+
+  // 파티클 버스트
+  const symbols = ['👑','✨','💫','⭐','🌟','🏆','💛','🎊','🎉'];
+  for (let i = 0; i < 20; i++) {
+    const el    = document.createElement('div');
+    el.className = 'max-p';
+    const angle = (i / 20) * Math.PI * 2 + Math.random() * 0.3;
+    const dist  = 70 + Math.random() * 130;
+    const tx    = Math.cos(angle) * dist;
+    const ty    = Math.sin(angle) * dist;
+    const dur   = (1.1 + Math.random() * 0.6).toFixed(2) + 's';
+    const delay = (Math.random() * 0.25).toFixed(2) + 's';
+    el.style.cssText =
+      `left:${cx}px;top:${cy}px;font-size:${18+Math.random()*16}px;`+
+      `--tx:${tx}px;--ty:${ty}px;--dur:${dur};--delay:${delay};`;
+    el.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+    p.appendChild(el);
+    setTimeout(() => el.remove(), 2500);
+  }
+
+  // 알림
+  notify('👑 만렙 고라니 달성!', 'ok');
+}
 
 // ══════════════════════════════════════════
 // 상점
