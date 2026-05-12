@@ -153,6 +153,32 @@ body{background:var(--bg);color:var(--text);font-family:'Malgun Gothic','Apple S
 @keyframes bubblefade{from{opacity:1;transform:translate(-50%,-100%) scale(1);}
   to{opacity:0;transform:translate(-50%,-120%) scale(.9);}}
 
+/* ── zzz 수면 ── */
+.zzz{position:absolute;transform:translateX(-50%);pointer-events:none;
+  font-size:12px;font-weight:bold;color:#8899ee;
+  background:rgba(15,20,60,.88);padding:2px 7px;border-radius:10px;
+  animation:zzzfloat 2s ease-out forwards;white-space:nowrap;}
+@keyframes zzzfloat{0%{opacity:0;transform:translateX(-50%) translateY(0) scale(.7);}
+  15%{opacity:1;transform:translateX(-50%) translateY(-4px) scale(1);}
+  100%{opacity:0;transform:translateX(-50%) translateY(-40px) scale(.8);}}
+.deer-el.sleeping .deer-inner{filter:brightness(.62);animation:none;}
+.deer-el.sleeping .deer-inner img,
+.deer-el.sleeping .deer-inner .d-fallback{animation:none;}
+
+/* ── 풀 먹기 ── */
+.eat-pop{position:absolute;transform:translateX(-50%);pointer-events:none;
+  font-size:12px;font-weight:bold;color:#3a9a3a;
+  background:rgba(10,40,10,.9);padding:2px 8px;border-radius:10px;
+  animation:eatpop 1.6s ease-out forwards;white-space:nowrap;}
+@keyframes eatpop{0%{opacity:0;transform:translateX(-50%) scale(.6);}
+  18%{opacity:1;transform:translateX(-50%) scale(1.05);}
+  70%{opacity:1;transform:translateX(-50%) translateY(-8px);}
+  100%{opacity:0;transform:translateX(-50%) translateY(-22px);}}
+
+/* ── 만렙 이미지 회전 보정 ── */
+.deer-inner img.rot90{transform-origin:center;
+  width:64px;height:64px;object-fit:cover;border-radius:50%;}
+
 /* ── MAX LEVEL EFFECT ── */
 /* 만렙 전체화면 이펙트 */
 #max-flash{display:none;position:fixed;inset:0;pointer-events:none;z-index:400;}
@@ -468,30 +494,102 @@ function animLoop() {
   lastAnim = now;
   S.deer.forEach(d => {
     if (d.dragging) return;
+
+    const el = document.getElementById('deer-el-' + d.id);
+    if (!el) return;
+
+    if (d.sleeping) {
+      // 잠든 상태 - 이동 없음
+      return;
+    }
+
     const dx = d.tx - d.x, dy = d.ty - d.y;
     const dist = Math.sqrt(dx*dx + dy*dy);
+
     if (dist < 2.5) {
-      d.wait = (d.wait || 0) - dt;
+      d.wait     = (d.wait    || 0) - dt;
+      d.sleepAcc = (d.sleepAcc|| 0) + dt;
+      d.eatCd    = (d.eatCd   || 8) - dt;
+
+      // 풀 먹기
+      if (d.eatCd <= 0) {
+        triggerEat(d);
+        d.eatCd = 7 + Math.random() * 10;
+      }
+      // 수면 진입 (15초 정지)
+      if (d.sleepAcc >= 15) {
+        d.sleeping = true;
+        startSleeping(d);
+        return;
+      }
       if (d.wait <= 0) {
         d.tx   = 10 + Math.random() * 80;
         d.ty   = 10 + Math.random() * 80;
         d.wait = 1.2 + Math.random() * 3;
       }
     } else {
+      d.sleepAcc = 0;
       const spd = d.spd * dt;
       const nx = dx/dist*spd, ny = dy/dist*spd;
       d.flipX = nx < 0;
       d.x = Math.max(8, Math.min(92, d.x + nx));
       d.y = Math.max(8, Math.min(90, d.y + ny));
     }
-    const el = document.getElementById('deer-el-' + d.id);
-    if (!el) return;
+
     el.style.left = d.x + '%';
     el.style.top  = d.y + '%';
-    const img = el.querySelector('img, .d-fallback');
-    if (img) img.style.transform = d.flipX ? 'scaleX(-1)' : 'scaleX(1)';
+    applyImgTransform(el, d);
   });
   requestAnimationFrame(animLoop);
+}
+
+function applyImgTransform(el, d) {
+  const imgEl = el.querySelector('img:not(.err), .d-fallback');
+  if (!imgEl) return;
+  const isMax = d.level === STAGES.length;
+  const flip  = d.flipX && !isMax ? 'scaleX(-1) ' : '';
+  const rot   = isMax ? 'rotate(-90deg)' : '';
+  imgEl.style.transform = (flip + rot).trim() || 'none';
+}
+
+// ══════════════════════════════════════════
+// 수면 & 식사 시스템
+// ══════════════════════════════════════════
+const sleepIntervals = {};
+
+function startSleeping(d) {
+  const el = document.getElementById('deer-el-' + d.id);
+  if (!el) return;
+  el.classList.add('sleeping');
+  spawnZzz(d);
+  if (!sleepIntervals[d.id]) {
+    sleepIntervals[d.id] = setInterval(() => {
+      if (!d.sleeping) { clearInterval(sleepIntervals[d.id]); delete sleepIntervals[d.id]; return; }
+      spawnZzz(d);
+    }, 1800);
+  }
+}
+
+function wakeUp(d) {
+  d.sleeping = false; d.sleepAcc = 0;
+  document.getElementById('deer-el-' + d.id)?.classList.remove('sleeping');
+  if (sleepIntervals[d.id]) { clearInterval(sleepIntervals[d.id]); delete sleepIntervals[d.id]; }
+}
+
+function spawnZzz(d) {
+  const el = document.getElementById('deer-el-' + d.id); if (!el) return;
+  const z = document.createElement('div'); z.className = 'zzz';
+  z.style.cssText = `left:calc(50% + ${(Math.random()-.5)*16}px);top:-10px;`;
+  z.textContent = ['z','z z','Z Z Z'][Math.floor(Math.random()*3)];
+  el.appendChild(z); setTimeout(() => z.remove(), 2000);
+}
+
+function triggerEat(d) {
+  const el = document.getElementById('deer-el-' + d.id); if (!el) return;
+  const nom = document.createElement('div'); nom.className = 'eat-pop';
+  nom.style.cssText = 'left:50%;top:-5px;';
+  nom.textContent = ['냠냠🌿','옴뇸뇸','맛있어~','🌿🌿'][Math.floor(Math.random()*4)];
+  el.appendChild(nom); setTimeout(() => nom.remove(), 1600);
 }
 
 // ══════════════════════════════════════════
@@ -507,6 +605,7 @@ function startDrag(e, id) {
   dragId = id;
   const d = S.deer.find(x => x.id === id);
   if (!d) return;
+  if (d.sleeping) wakeUp(d);
   d.dragging = true;
 
   const cl = e.touches ? e.touches[0] : e;
@@ -692,6 +791,7 @@ function makeDeerObj(level, x, y) {
     ty:   10 + Math.random() * 80,
     spd:  stage.spd + (Math.random() - 0.5) * 2,
     wait: 0, flipX: false, dragging: false,
+    sleepAcc: 0, sleeping: false, eatCd: 5 + Math.random() * 10,
   };
 }
 
@@ -969,6 +1069,11 @@ function loadGame() {
   try {
     const d = JSON.parse(raw);
     Object.assign(S, d);
+    S.deer.forEach(deer => {
+      if (deer.sleepAcc  === undefined) deer.sleepAcc  = 0;
+      if (deer.sleeping  === undefined) deer.sleeping  = false;
+      if (deer.eatCd     === undefined) deer.eatCd     = 5 + Math.random() * 10;
+    });
     const offSec = Math.min((Date.now() - S.lastSave) / 1000, 3600 * 8);
     if (offSec > 60) {
       const g = totalGps()*offSec, gld = totalGoldps()*offSec;
