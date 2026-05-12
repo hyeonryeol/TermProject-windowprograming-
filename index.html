@@ -548,7 +548,7 @@ function applyImgTransform(el, d) {
   if (!imgEl) return;
   const isMax = d.level === STAGES.length;
   const flip  = d.flipX && !isMax ? 'scaleX(-1) ' : '';
-  const rot   = isMax ? 'rotate(-90deg)' : '';
+  const rot   = (isMax && d.eating) ? 'rotate(-90deg)' : '';
   imgEl.style.transform = (flip + rot).trim() || 'none';
 }
 
@@ -589,7 +589,10 @@ function triggerEat(d) {
   const nom = document.createElement('div'); nom.className = 'eat-pop';
   nom.style.cssText = 'left:50%;top:-5px;';
   nom.textContent = ['냠냠🌿','옴뇸뇸','맛있어~','🌿🌿'][Math.floor(Math.random()*4)];
-  el.appendChild(nom); setTimeout(() => nom.remove(), 1600);
+  el.appendChild(nom);
+  d.eating = true;
+  applyImgTransform(el, d);
+  setTimeout(() => { nom.remove(); d.eating = false; applyImgTransform(el, d); }, 1600);
 }
 
 // ══════════════════════════════════════════
