@@ -251,6 +251,39 @@
     .info-item .i-val { font-weight: 700; }
 
     .empty { text-align: center; padding: 40px; color: #bbb; font-size: 15px; }
+
+    .location-bar {
+      background: #fff8f5;
+      border-bottom: 1px solid #ffe0cc;
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      color: #666;
+    }
+
+    .location-bar button {
+      padding: 5px 12px;
+      border-radius: 14px;
+      border: 1px solid #ff6b35;
+      background: white;
+      color: #ff6b35;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .location-bar button:hover { background: #fff3ee; }
+
+    .loc-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: #ccc;
+      flex-shrink: 0;
+    }
+
+    .loc-dot.active { background: #4caf50; }
   </style>
 </head>
 <body>
@@ -261,6 +294,12 @@
     <span>점심 메뉴 추천 서비스</span>
   </div>
 </header>
+
+<div class="location-bar" id="location-bar">
+  <div class="loc-dot" id="loc-dot"></div>
+  <span id="loc-text">위치 정보 없음</span>
+  <button onclick="getLocation()">📍 내 위치 가져오기</button>
+</div>
 
 <div class="search-bar">
   <button class="quick-btn" onclick="quickRecommend()">⚡ 지금 먹기 좋은 곳</button>
@@ -359,6 +398,61 @@ const RESTAURANTS = [
 
 const CATEGORY_LABEL = { korean: "한식", japanese: "일식", chinese: "중식", western: "양식" };
 const PRICE_LABEL = { low: "저렴", medium: "보통", high: "고급" };
+
+let userLat = null;
+let userLng = null;
+
+function haversine(lat1, lng1, lat2, lng2) {
+  const R = 6371000;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLng = (lng2 - lng1) * Math.PI / 180;
+  const a = Math.sin(dLat/2)**2 +
+            Math.cos(lat1*Math.PI/180) * Math.cos(lat2*Math.PI/180) *
+            Math.sin(dLng/2)**2;
+  return Math.round(R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
+}
+
+function calcScore(r) {
+  const dist = r.distance;
+  const maxRadius = 5000;
+  const distScore = Math.max(0, 1 - dist / maxRadius);
+  const waitScore = r.waitTime <= 5 ? 1.0 : r.waitTime <= 15 ? 0.7 : r.waitTime <= 30 ? 0.4 : 0.1;
+  const raw = (r.rating/5)*0.4 + 0.75*0.3 + distScore*0.2 + waitScore*0.1;
+  return Math.round(raw * 100 * 10) / 10;
+}
+
+function getLocation() {
+  if (!navigator.geolocation) {
+    alert("이 브라우저는 위치 서비스를 지원하지 않습니다.");
+    return;
+  }
+  document.getElementById("loc-text").textContent = "위치 가져오는 중...";
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      userLat = pos.coords.latitude;
+      userLng = pos.coords.longitude;
+
+      RESTAURANTS.forEach(r => {
+        r.distance = haversine(userLat, userLng, r.location.lat, r.location.lng);
+        r.score = calcScore(r);
+      });
+
+      document.getElementById("loc-dot").classList.add("active");
+      document.getElementById("loc-text").textContent =
+        `내 위치: ${userLat.toFixed(4)}, ${userLng.toFixed(4)} (거리 실시간 반영됨)`;
+      render();
+    },
+    (err) => {
+      const msg = {
+        1: "위치 권한이 거부되었습니다. 브라우저 설정에서 허용해주세요.",
+        2: "위치를 가져올 수 없습니다.",
+        3: "위치 요청 시간이 초과되었습니다.",
+      };
+      document.getElementById("loc-text").textContent = msg[err.code] || "위치 오류";
+    },
+    { timeout: 10000, enableHighAccuracy: true }
+  );
+}
 
 function stars(rating) {
   const full = Math.floor(rating);
@@ -514,6 +608,7 @@ function closeModal(e) {
 }
 
 render();
+getLocation();
 </script>
 </body>
 </html>
