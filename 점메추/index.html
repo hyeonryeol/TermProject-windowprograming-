@@ -251,8 +251,6 @@
     .info-item .i-val { font-weight: 700; }
 
     .empty { text-align: center; padding: 40px; color: #bbb; font-size: 15px; }
-<<<<<<< HEAD
-=======
 
     .location-bar {
       background: #fff8f5;
@@ -286,7 +284,6 @@
     }
 
     .loc-dot.active { background: #4caf50; }
->>>>>>> d5188e51c6bad64933ba34c94279afc570d74428
   </style>
 </head>
 <body>
@@ -298,15 +295,12 @@
   </div>
 </header>
 
-<<<<<<< HEAD
-=======
 <div class="location-bar" id="location-bar">
   <div class="loc-dot" id="loc-dot"></div>
   <span id="loc-text">위치 정보 없음</span>
   <button onclick="getLocation()">📍 내 위치 가져오기</button>
 </div>
 
->>>>>>> d5188e51c6bad64933ba34c94279afc570d74428
 <div class="search-bar">
   <button class="quick-btn" onclick="quickRecommend()">⚡ 지금 먹기 좋은 곳</button>
   <select id="filter-category" onchange="render()">
@@ -405,8 +399,6 @@ const RESTAURANTS = [
 const CATEGORY_LABEL = { korean: "한식", japanese: "일식", chinese: "중식", western: "양식" };
 const PRICE_LABEL = { low: "저렴", medium: "보통", high: "고급" };
 
-<<<<<<< HEAD
-=======
 let userLat = null;
 let userLng = null;
 
@@ -462,7 +454,6 @@ function getLocation() {
   );
 }
 
->>>>>>> d5188e51c6bad64933ba34c94279afc570d74428
 function stars(rating) {
   const full = Math.floor(rating);
   const half = rating - full >= 0.5 ? "½" : "";
@@ -617,10 +608,7 @@ function closeModal(e) {
 }
 
 render();
-<<<<<<< HEAD
-=======
 getLocation();
->>>>>>> d5188e51c6bad64933ba34c94279afc570d74428
 </script>
 </body>
 </html>
