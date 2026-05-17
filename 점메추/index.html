@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>점메추 - 점심 메뉴 추천</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+      background: #f5f5f5;
+      color: #222;
+    }
+
+    header {
+      background: #ff6b35;
+      color: white;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+
+    header h1 { font-size: 22px; font-weight: 700; }
+    header span { font-size: 13px; opacity: 0.85; }
+
+    .search-bar {
+      background: white;
+      padding: 16px 20px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      border-bottom: 1px solid #eee;
+    }
+
+    .search-bar select, .search-bar button {
+      padding: 8px 14px;
+      border-radius: 20px;
+      border: 1px solid #ddd;
+      font-size: 14px;
+      cursor: pointer;
+      outline: none;
+    }
+
+    .search-bar select { background: white; }
+
+    .search-bar button {
+      background: #ff6b35;
+      color: white;
+      border: none;
+      font-weight: 600;
+    }
+
+    .search-bar button:hover { background: #e55a25; }
+
+    .quick-btn {
+      background: #fff3ee !important;
+      color: #ff6b35 !important;
+      border: 1px solid #ff6b35 !important;
+      font-weight: 600;
+    }
+
+    .quick-btn:hover { background: #ffe0d0 !important; }
+
+    .container { padding: 16px 20px; max-width: 760px; margin: 0 auto; }
+
+    .section-title {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      color: #444;
+    }
+
+    .card-list { display: flex; flex-direction: column; gap: 12px; }
+
+    .card {
+      background: white;
+      border-radius: 14px;
+      padding: 16px;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.07);
+      display: flex;
+      gap: 14px;
+      cursor: pointer;
+      transition: box-shadow 0.2s;
+    }
+
+    .card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.12); }
+
+    .card-rank {
+      font-size: 22px;
+      font-weight: 800;
+      color: #ff6b35;
+      min-width: 28px;
+      padding-top: 2px;
+    }
+
+    .card-body { flex: 1; }
+
+    .card-name {
+      font-size: 17px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .card-tags {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-bottom: 8px;
+    }
+
+    .tag {
+      font-size: 11px;
+      padding: 3px 9px;
+      border-radius: 20px;
+      font-weight: 600;
+    }
+
+    .tag-open { background: #e8f5e9; color: #2e7d32; }
+    .tag-closed { background: #fce4ec; color: #c62828; }
+    .tag-delivery { background: #e3f2fd; color: #1565c0; }
+    .tag-cat { background: #f3e5f5; color: #6a1b9a; }
+
+    .card-meta {
+      display: flex;
+      gap: 16px;
+      font-size: 13px;
+      color: #666;
+    }
+
+    .card-meta span { display: flex; align-items: center; gap: 3px; }
+
+    .card-score {
+      text-align: right;
+      min-width: 60px;
+    }
+
+    .score-num {
+      font-size: 22px;
+      font-weight: 800;
+      color: #ff6b35;
+    }
+
+    .score-label { font-size: 11px; color: #999; }
+
+    .stars { color: #ffc107; font-size: 13px; }
+
+    .reason-list {
+      margin-top: 8px;
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .reason-chip {
+      font-size: 11px;
+      background: #fff3ee;
+      color: #ff6b35;
+      border-radius: 10px;
+      padding: 2px 8px;
+    }
+
+    /* 모달 */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 100;
+      justify-content: center;
+      align-items: flex-end;
+    }
+
+    .modal-overlay.open { display: flex; }
+
+    .modal {
+      background: white;
+      border-radius: 20px 20px 0 0;
+      padding: 24px 20px;
+      width: 100%;
+      max-width: 760px;
+      max-height: 80vh;
+      overflow-y: auto;
+      animation: slideUp 0.25s ease;
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+
+    .modal-close {
+      float: right;
+      font-size: 22px;
+      cursor: pointer;
+      color: #999;
+      line-height: 1;
+    }
+
+    .modal h2 { font-size: 20px; margin-bottom: 6px; }
+
+    .modal-address { font-size: 13px; color: #888; margin-bottom: 14px; }
+
+    .modal-section { margin-bottom: 16px; }
+    .modal-section h3 { font-size: 14px; font-weight: 700; margin-bottom: 8px; color: #444; }
+
+    .platform-ratings {
+      display: flex;
+      gap: 12px;
+    }
+
+    .platform-box {
+      flex: 1;
+      background: #f9f9f9;
+      border-radius: 10px;
+      padding: 10px;
+      text-align: center;
+    }
+
+    .platform-box .p-name { font-size: 12px; color: #888; }
+    .platform-box .p-score { font-size: 20px; font-weight: 800; color: #333; }
+
+    .menu-list { display: flex; flex-direction: column; gap: 6px; }
+
+    .menu-item {
+      display: flex;
+      justify-content: space-between;
+      font-size: 14px;
+      padding: 6px 0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .menu-price { color: #ff6b35; font-weight: 600; }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .info-item {
+      background: #f9f9f9;
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 13px;
+    }
+
+    .info-item .i-label { color: #888; font-size: 11px; margin-bottom: 2px; }
+    .info-item .i-val { font-weight: 700; }
+
+    .empty { text-align: center; padding: 40px; color: #bbb; font-size: 15px; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>🍽️ 점메추</h1>
+    <span>점심 메뉴 추천 서비스</span>
+  </div>
+</header>
+
+<div class="search-bar">
+  <button class="quick-btn" onclick="quickRecommend()">⚡ 지금 먹기 좋은 곳</button>
+  <select id="filter-category" onchange="render()">
+    <option value="">전체 카테고리</option>
+    <option value="korean">한식</option>
+    <option value="japanese">일식</option>
+    <option value="chinese">중식</option>
+    <option value="western">양식</option>
+  </select>
+  <select id="filter-price" onchange="render()">
+    <option value="">전체 가격대</option>
+    <option value="low">저렴</option>
+    <option value="medium">보통</option>
+    <option value="high">고급</option>
+  </select>
+  <select id="filter-delivery" onchange="render()">
+    <option value="">배달 전체</option>
+    <option value="true">배달 가능</option>
+  </select>
+  <select id="sort" onchange="render()">
+    <option value="score">추천 점수순</option>
+    <option value="rating">평점순</option>
+    <option value="distance">거리순</option>
+    <option value="waitTime">대기시간순</option>
+  </select>
+</div>
+
+<div class="container">
+  <div class="section-title" id="section-title">추천 음식점</div>
+  <div class="card-list" id="card-list"></div>
+</div>
+
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+  <div class="modal" id="modal-content"></div>
+</div>
+
+<script>
+const RESTAURANTS = [
+  {
+    id: "rest_001", name: "홍길동식당", category: "korean", priceRange: "medium",
+    address: "서울시 강남구 테헤란로 123", phone: "02-123-4567",
+    location: { lat: 37.566, lng: 126.978 }, distance: 320,
+    rating: 4.3, reviewCount: 182, openNow: true, delivery: true,
+    reservation: true, capacity: "medium", waitTime: 5, estimatedDeliveryTime: 25,
+    menus: [{ name: "김치찌개", price: 8000 }, { name: "된장찌개", price: 7000 }, { name: "불고기", price: 12000 }],
+    sources: { google: 4.4, naver: 4.2, kakao: 4.3 },
+    reasons: ["현재 영업 중", "리뷰 평점 높음", "대기시간 짧음", "배달 가능"],
+    score: 89.1,
+  },
+  {
+    id: "rest_002", name: "스시오마카세", category: "japanese", priceRange: "high",
+    address: "서울시 강남구 압구정로 45", phone: "02-234-5678",
+    location: { lat: 37.568, lng: 126.981 }, distance: 346,
+    rating: 4.7, reviewCount: 320, openNow: true, delivery: false,
+    reservation: true, capacity: "small", waitTime: 20, estimatedDeliveryTime: null,
+    menus: [{ name: "오마카세 런치", price: 55000 }, { name: "오마카세 디너", price: 88000 }],
+    sources: { google: 4.8, naver: 4.6, kakao: 4.7 },
+    reasons: ["현재 영업 중", "리뷰 평점 높음", "리뷰 감성 점수 우수"],
+    score: 84.5,
+  },
+  {
+    id: "rest_003", name: "피자헛 강남점", category: "western", priceRange: "medium",
+    address: "서울시 강남구 강남대로 200", phone: "02-345-6789",
+    location: { lat: 37.563, lng: 126.975 }, distance: 426,
+    rating: 3.9, reviewCount: 541, openNow: true, delivery: true,
+    reservation: false, capacity: "large", waitTime: 2, estimatedDeliveryTime: 35,
+    menus: [{ name: "슈프림 피자 L", price: 28900 }, { name: "치즈크러스트 M", price: 22900 }],
+    sources: { google: 4.0, naver: 3.8, kakao: 3.9 },
+    reasons: ["현재 영업 중", "대기시간 짧음", "배달 가능"],
+    score: 80.9,
+  },
+  {
+    id: "rest_004", name: "마라탕후루", category: "chinese", priceRange: "low",
+    address: "서울시 마포구 홍대입구 77", phone: "02-456-7890",
+    location: { lat: 37.557, lng: 126.924 }, distance: 4864,
+    rating: 4.1, reviewCount: 890, openNow: false, delivery: true,
+    reservation: false, capacity: "medium", waitTime: 0, estimatedDeliveryTime: 30,
+    menus: [{ name: "마라탕 (중)", price: 12000 }, { name: "탕후루 세트", price: 6000 }],
+    sources: { google: 4.2, naver: 4.0, kakao: 4.1 },
+    reasons: ["배달 가능"],
+    score: 55.2,
+  },
+  {
+    id: "rest_005", name: "버거킹 신촌점", category: "western", priceRange: "low",
+    address: "서울시 서대문구 신촌로 100", phone: "02-567-8901",
+    location: { lat: 37.555, lng: 126.937 }, distance: 3815,
+    rating: 3.6, reviewCount: 1200, openNow: true, delivery: true,
+    reservation: false, capacity: "large", waitTime: 3, estimatedDeliveryTime: 20,
+    menus: [{ name: "와퍼", price: 7200 }, { name: "불고기버거 세트", price: 8500 }],
+    sources: { google: 3.7, naver: 3.5, kakao: 3.6 },
+    reasons: ["현재 영업 중", "대기시간 짧음", "배달 가능"],
+    score: 61.3,
+  },
+];
+
+const CATEGORY_LABEL = { korean: "한식", japanese: "일식", chinese: "중식", western: "양식" };
+const PRICE_LABEL = { low: "저렴", medium: "보통", high: "고급" };
+
+function stars(rating) {
+  const full = Math.floor(rating);
+  const half = rating - full >= 0.5 ? "½" : "";
+  return "★".repeat(full) + half;
+}
+
+function formatDistance(m) {
+  return m >= 1000 ? (m / 1000).toFixed(1) + "km" : m + "m";
+}
+
+function getFiltered() {
+  const cat = document.getElementById("filter-category").value;
+  const price = document.getElementById("filter-price").value;
+  const delivery = document.getElementById("filter-delivery").value;
+  const sort = document.getElementById("sort").value;
+
+  let list = RESTAURANTS.filter(r =>
+    (!cat || r.category === cat) &&
+    (!price || r.priceRange === price) &&
+    (!delivery || r.delivery)
+  );
+
+  const sortFn = {
+    score: (a, b) => b.score - a.score,
+    rating: (a, b) => b.rating - a.rating,
+    distance: (a, b) => a.distance - b.distance,
+    waitTime: (a, b) => a.waitTime - b.waitTime,
+  };
+  list.sort(sortFn[sort]);
+  return list;
+}
+
+function render() {
+  const list = getFiltered();
+  const container = document.getElementById("card-list");
+  const title = document.getElementById("section-title");
+  title.textContent = `추천 음식점 (${list.length}곳)`;
+
+  if (!list.length) {
+    container.innerHTML = '<div class="empty">조건에 맞는 음식점이 없어요 😢</div>';
+    return;
+  }
+
+  container.innerHTML = list.map((r, i) => `
+    <div class="card" onclick="openModal('${r.id}')">
+      <div class="card-rank">${i + 1}</div>
+      <div class="card-body">
+        <div class="card-name">${r.name}</div>
+        <div class="card-tags">
+          <span class="tag ${r.openNow ? 'tag-open' : 'tag-closed'}">${r.openNow ? '영업 중' : '영업 종료'}</span>
+          ${r.delivery ? '<span class="tag tag-delivery">배달</span>' : ''}
+          <span class="tag tag-cat">${CATEGORY_LABEL[r.category] || r.category}</span>
+          <span class="tag tag-cat">${PRICE_LABEL[r.priceRange]}</span>
+        </div>
+        <div class="card-meta">
+          <span><span class="stars">${stars(r.rating)}</span> ${r.rating}</span>
+          <span>📍 ${formatDistance(r.distance)}</span>
+          <span>⏱ 대기 ${r.waitTime}분</span>
+        </div>
+        <div class="reason-list">
+          ${r.reasons.map(rs => `<span class="reason-chip">${rs}</span>`).join('')}
+        </div>
+      </div>
+      <div class="card-score">
+        <div class="score-num">${r.score}</div>
+        <div class="score-label">점수</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function quickRecommend() {
+  document.getElementById("filter-category").value = "";
+  document.getElementById("filter-price").value = "";
+  document.getElementById("filter-delivery").value = "";
+  document.getElementById("sort").value = "score";
+  document.getElementById("section-title").textContent = "⚡ 지금 먹기 좋은 곳";
+
+  const open = RESTAURANTS.filter(r => r.openNow).sort((a, b) => b.score - a.score);
+  const container = document.getElementById("card-list");
+  container.innerHTML = open.map((r, i) => `
+    <div class="card" onclick="openModal('${r.id}')">
+      <div class="card-rank">${i + 1}</div>
+      <div class="card-body">
+        <div class="card-name">${r.name}</div>
+        <div class="card-tags">
+          <span class="tag tag-open">영업 중</span>
+          ${r.delivery ? '<span class="tag tag-delivery">배달</span>' : ''}
+          <span class="tag tag-cat">${CATEGORY_LABEL[r.category]}</span>
+        </div>
+        <div class="card-meta">
+          <span><span class="stars">${stars(r.rating)}</span> ${r.rating}</span>
+          <span>📍 ${formatDistance(r.distance)}</span>
+          <span>⏱ 대기 ${r.waitTime}분</span>
+        </div>
+        <div class="reason-list">
+          ${r.reasons.map(rs => `<span class="reason-chip">${rs}</span>`).join('')}
+        </div>
+      </div>
+      <div class="card-score">
+        <div class="score-num">${r.score}</div>
+        <div class="score-label">점수</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function openModal(id) {
+  const r = RESTAURANTS.find(x => x.id === id);
+  if (!r) return;
+
+  document.getElementById("modal-content").innerHTML = `
+    <span class="modal-close" onclick="document.getElementById('modal-overlay').classList.remove('open')">✕</span>
+    <h2>${r.name}</h2>
+    <div class="modal-address">📍 ${r.address} · 📞 ${r.phone}</div>
+
+    <div class="modal-section">
+      <h3>현황</h3>
+      <div class="info-grid">
+        <div class="info-item"><div class="i-label">영업 상태</div><div class="i-val">${r.openNow ? '✅ 영업 중' : '❌ 영업 종료'}</div></div>
+        <div class="info-item"><div class="i-label">배달</div><div class="i-val">${r.delivery ? '✅ 가능' : '❌ 불가'}</div></div>
+        <div class="info-item"><div class="i-label">대기시간</div><div class="i-val">${r.waitTime}분</div></div>
+        <div class="info-item"><div class="i-label">예약</div><div class="i-val">${r.reservation ? '✅ 가능' : '❌ 불가'}</div></div>
+        <div class="info-item"><div class="i-label">규모</div><div class="i-val">${{ small: '소형', medium: '중형', large: '대형' }[r.capacity]}</div></div>
+        <div class="info-item"><div class="i-label">거리</div><div class="i-val">${formatDistance(r.distance)}</div></div>
+      </div>
+    </div>
+
+    <div class="modal-section">
+      <h3>플랫폼별 평점</h3>
+      <div class="platform-ratings">
+        <div class="platform-box"><div class="p-name">Google</div><div class="p-score">${r.sources.google}</div></div>
+        <div class="platform-box"><div class="p-name">Naver</div><div class="p-score">${r.sources.naver}</div></div>
+        <div class="platform-box"><div class="p-name">Kakao</div><div class="p-score">${r.sources.kakao}</div></div>
+      </div>
+    </div>
+
+    <div class="modal-section">
+      <h3>메뉴</h3>
+      <div class="menu-list">
+        ${r.menus.map(m => `<div class="menu-item"><span>${m.name}</span><span class="menu-price">${m.price.toLocaleString()}원</span></div>`).join('')}
+      </div>
+    </div>
+  `;
+  document.getElementById("modal-overlay").classList.add("open");
+}
+
+function closeModal(e) {
+  if (e.target === document.getElementById("modal-overlay")) {
+    document.getElementById("modal-overlay").classList.remove("open");
+  }
+}
+
+render();
+</script>
+</body>
+</html>
